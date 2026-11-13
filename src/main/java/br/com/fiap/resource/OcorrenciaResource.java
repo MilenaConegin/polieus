@@ -45,7 +45,7 @@ public class OcorrenciaResource {
         }
     }
 
-    @GetMapping("/{idOcorrencia}")
+    @DeleteMapping("/{idOcorrencia}")
     public ResponseEntity<String> delete(@PathVariable Integer idOcorrencia){
         if (ocorrenciaBO.delete(idOcorrencia)){
             return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Ocorrência deletada com sucesso!");
@@ -54,7 +54,7 @@ public class OcorrenciaResource {
         }
     }
 
-    @GetMapping("/{idOcorrencia}")
+    @PutMapping("/{idOcorrencia}")
     public ResponseEntity<?> update(@PathVariable Integer idOcorrencia, @RequestBody @Valid OcorrenciaTO ocorrencia){
         try{
             ocorrencia.setIdOcorrencia(idOcorrencia);
