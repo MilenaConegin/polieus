@@ -49,6 +49,7 @@ public class OcorrenciaDAO {
                     ocorrencia.setEndereco(rs.getString("endereco"));
                     ocorrencia.setDepartamento(rs.getString("departamento"));
                     ocorrencia.setCep(rs.getString("cep"));
+                    ocorrencias.add(ocorrencia);
                 }
             }else {
                 return null;
@@ -67,7 +68,7 @@ public class OcorrenciaDAO {
         try (PreparedStatement ps = ConnectionFactory.getConnection().prepareStatement(sql)){
             ps.setInt(1, idOcorrencia);
             ResultSet rs = ps.executeQuery();
-            if (rs != null){
+            if (rs.next()){
                     ocorrencia.setIdOcorrencia(rs.getInt("id_ocorrencia"));
                     ocorrencia.setCategoria(rs.getString("categoria"));
                     ocorrencia.setDescricao(rs.getString("descricao"));
