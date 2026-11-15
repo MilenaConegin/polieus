@@ -1,6 +1,8 @@
 package br.com.fiap.to;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.*;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
 
@@ -16,6 +18,7 @@ public class HistoricoTO {
 
     @NotNull
     @PastOrPresent
+    @JsonFormat(pattern = "dd-MM-yyyy")
     private LocalDate data;
 
     @NotBlank
