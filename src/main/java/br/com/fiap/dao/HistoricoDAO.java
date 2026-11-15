@@ -98,7 +98,7 @@ public class HistoricoDAO {
     }
 
     public HistoricoTO update(HistoricoTO historico){
-        String sql = "update ddd_acompanhamneto set protocolo = ?, categoria = ?, dt_acompanhamento = ?, status = ? where id_acompanhamento = ?  ";
+        String sql = "update ddd_acompanhamento set protocolo = ?, categoria = ?, dt_acompanhamento = ?, status = ? where id_acompanhamento = ?  ";
         try (PreparedStatement ps = ConnectionFactory.getConnection().prepareStatement(sql)) {
             ps.setString(1, historico.getProtocolo());
             ps.setString(2, historico.getCategoria());
