@@ -22,7 +22,12 @@ public class HistoricoDAO {
             }else {
                 return null;
             }
-        } catch (SQLException e) {
+        }catch (SQLException e) {
+
+            if (e.getErrorCode() == 1) {
+                throw new RuntimeException("Histórico já cadastrado!");
+            }
+
             System.out.println("Erro ao salvar histórico: " + e.getMessage());
         } finally {
             ConnectionFactory.closeConnection();
@@ -63,7 +68,7 @@ public class HistoricoDAO {
             ps.setInt(1, idHistorico);
             ResultSet rs = ps.executeQuery();
               if (rs.next()){
-                  historico.setIdHistorico(rs.getInt("id_historico"));
+                  historico.setIdHistorico(rs.getInt("id_acompanhamento"));
                   historico.setProtocolo(rs.getString("protocolo"));
                   historico.setCategoria(rs.getString("categoria"));
                   historico.setData(rs.getDate("dt_acompanhamento").toLocalDate());
