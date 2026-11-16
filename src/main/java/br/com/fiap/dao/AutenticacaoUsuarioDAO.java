@@ -58,12 +58,12 @@ public class AutenticacaoUsuarioDAO {
     }
 
     public AutenticacaoUsuarioTO findById(Integer idAutenticacao) {
+        AutenticacaoUsuarioTO autenticacao = new AutenticacaoUsuarioTO();
         String sql = "select * from ddd_autenticacao_usuario where id_autenticacao = ?";
         try (PreparedStatement ps = ConnectionFactory.getConnection().prepareStatement(sql)) {
             ps.setInt(1, idAutenticacao);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
-                AutenticacaoUsuarioTO autenticacao = new AutenticacaoUsuarioTO();
                 autenticacao.setIdAutenticacao(rs.getInt("id_autenticacao"));
                 autenticacao.setEmail(rs.getString("email"));
                 autenticacao.setSenha(rs.getString("senha"));
@@ -75,7 +75,7 @@ public class AutenticacaoUsuarioDAO {
         } finally {
             ConnectionFactory.closeConnection();
         }
-        return null;
+        return autenticacao;
     }
 
     public boolean delete(Integer idAutenticacao) {
