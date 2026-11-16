@@ -6,7 +6,7 @@ import jakarta.validation.constraints.*;
 import java.time.LocalDate;
 
 public class AnaliseTO {
-    private Integer IdAnalise;
+    private Integer idAnalise;
 
     @NotBlank
     private String protocolo;
@@ -52,11 +52,11 @@ public class AnaliseTO {
     }
 
     public Integer getIdAnalise() {
-        return IdAnalise;
+        return idAnalise;
     }
 
     public void setIdAnalise(Integer idAnalise) {
-        IdAnalise = idAnalise;
+        this.idAnalise = idAnalise;
     }
 
     public String getProtocolo() {
