@@ -22,7 +22,7 @@ public class OcorrenciaBO {
     public OcorrenciaTO findById(Integer idOcorrencia){
         ocorrenciaDAO = new OcorrenciaDAO();
 
-        if (idOcorrencia <= 0) {
+        if (idOcorrencia == null || idOcorrencia <= 0) {
             throw new IllegalArgumentException(
                     "Informe um ID válido."
             );
@@ -34,7 +34,7 @@ public class OcorrenciaBO {
     public boolean delete(Integer idOcorrencia){
         ocorrenciaDAO = new OcorrenciaDAO();
 
-        if (idOcorrencia <= 0) {
+        if (idOcorrencia == null || idOcorrencia <= 0) {
             throw new IllegalArgumentException(
                     "Informe um ID válido."
             );

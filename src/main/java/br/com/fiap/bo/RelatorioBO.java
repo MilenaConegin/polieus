@@ -13,11 +13,6 @@ public class RelatorioBO {
     public RelatorioTO save(RelatorioTO relatorio){
        relatorioDAO = new RelatorioDAO();
 
-        if (relatorio.getCategoria() == null ||
-                relatorio.getCategoria().isBlank()){
-            throw new IllegalArgumentException("Informe a categoria do relatório.");
-        }
-
         if (relatorio.getPrioridade() == null ||
                 (!relatorio.getPrioridade().equals("Alta") &&
                         !relatorio.getPrioridade().equals("Média") &&
@@ -59,11 +54,6 @@ public class RelatorioBO {
         if (relatorio.getIdRelatorio() == null ||
                 relatorio.getIdRelatorio() <= 0){
             throw new IllegalArgumentException("Informe um ID válido.");
-        }
-
-        if (relatorio.getCategoria() == null ||
-                relatorio.getCategoria().isBlank()){
-            throw new IllegalArgumentException("Informe a categoria do relatório.");
         }
 
         if (relatorio.getPrioridade() == null ||

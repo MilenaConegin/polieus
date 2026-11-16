@@ -13,6 +13,22 @@ public class AnaliseBO {
 
     public AnaliseTO save(AnaliseTO analise) {
         analiseDAO = new AnaliseDAO();
+
+        if (analise.getData().isAfter(LocalDate.now())) {
+            throw new IllegalArgumentException("A data não pode ser futura.");
+        }
+
+        if (analise.getStatus() == null ||
+                !analise.getStatus().matches(
+                        "Pendente|Em análise|Em andamento|Concluído")) {
+            throw new IllegalArgumentException("Status inválido.");
+        }
+
+        if (analise.getPrioridade() == null ||
+                !analise.getPrioridade().matches("Alta|Média|Baixa")) {
+            throw new IllegalArgumentException("Prioridade inválida.");
+        }
+
         return analiseDAO.save(analise);
     }
 
