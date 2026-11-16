@@ -20,13 +20,12 @@ public class HistoricoResource {
         try {
             HistoricoTO resultado = historicoBO.save(historico);
             return ResponseEntity.status(HttpStatus.CREATED).body(resultado);
-        } catch (IllegalArgumentException e){
+        } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body("Erro ao salvar histórico");
-        }catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Erro interno ao salvar histórico");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erro interno ao salvar histórico");
         }
     }
 
@@ -65,10 +64,12 @@ public class HistoricoResource {
             historico.setIdHistorico(idHistorico);
             HistoricoTO resultado = historicoBO.update(historico);
             return ResponseEntity.status(HttpStatus.CREATED).body(resultado);
-        } catch (IllegalArgumentException e){
+        }  catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Erro ao atualizar histórico");
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("Erro ao salvar histórico");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erro interno ao atualizar histórico");
         }
     }
 }

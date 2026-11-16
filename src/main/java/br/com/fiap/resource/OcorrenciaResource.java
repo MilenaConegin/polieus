@@ -20,8 +20,12 @@ public class OcorrenciaResource {
         try {
             OcorrenciaTO resultado = ocorrenciaBO.save(ocorrencia);
             return ResponseEntity.status(HttpStatus.CREATED).body(resultado);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Erro ao salvar ocorrência");
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Erro ao salvar ocorrência");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erro interno ao salvar ocorrência");
         }
     }
 
@@ -60,9 +64,12 @@ public class OcorrenciaResource {
             ocorrencia.setIdOcorrencia(idOcorrencia);
             OcorrenciaTO resultado = ocorrenciaBO.update(ocorrencia);
             return ResponseEntity.status(HttpStatus.CREATED).body(resultado);
-
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Erro ao atualizar ocorrência");
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Erro ao atualizar ocorrência");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erro interno ao atualizar ocorrência");
         }
     }
 

@@ -114,7 +114,7 @@ public class OcorrenciaDAO {
                 return null;
             }
         } catch (SQLException e) {
-
+            System.out.println("Erro ao atualizar ocorrência: " + e.getMessage());
         } finally {
             ConnectionFactory.closeConnection();
         }

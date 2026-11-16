@@ -21,8 +21,12 @@ public class RelatorioResource {
         try {
             RelatorioTO resultado = relatorioBO.save(relatorio);
             return ResponseEntity.status(HttpStatus.CREATED).body(resultado);
+        }catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Erro ao salvar relatório");
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Erro ao salvar relatório");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erro interno ao salvar relatório");
         }
     }
 
@@ -62,8 +66,12 @@ public class RelatorioResource {
             RelatorioTO resultado = relatorioBO.update(relatorio);
             return ResponseEntity.status(HttpStatus.CREATED).body(resultado);
 
+        }catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Erro ao atualizar relatório");
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Erro ao atualizar relatório");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erro interno ao atualizar relatório");
         }
     }
 }
