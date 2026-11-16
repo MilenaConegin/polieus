@@ -47,15 +47,4 @@ public class OcorrenciaBO {
         ocorrenciaDAO = new OcorrenciaDAO();
         return ocorrenciaDAO.update(ocorrencia);
     }
-
-
-
-
-
-
-
-
-
-
-
 }
