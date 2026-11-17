@@ -121,4 +121,29 @@ public class UsuarioDAO {
         }
         return null;
     }
+
+    public UsuarioTO login(String email, String senha) {
+        UsuarioTO usuario = new UsuarioTO();
+        String sql = "select id_usuario, nome, cpf, telefone, email from ddd_cadastro_usuario where email = ? and senha = ?";
+        try (PreparedStatement ps = ConnectionFactory.getConnection().prepareStatement(sql)) {
+            ps.setString(1, email);
+            ps.setString(2, senha);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                usuario.setIdUsuario(rs.getInt("id_usuario"));
+                usuario.setNomeUsuario(rs.getString("nome"));
+                usuario.setCpf(rs.getString("cpf"));
+                usuario.setTelefone(rs.getString("telefone"));
+                usuario.setEmail(rs.getString("email"));
+            }else {
+                return null;
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao realizar login: " + e.getMessage());
+
+        } finally {
+            ConnectionFactory.closeConnection();
+        }
+        return usuario;
+    }
 }

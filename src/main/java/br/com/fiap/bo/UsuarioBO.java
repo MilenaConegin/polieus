@@ -73,5 +73,23 @@ public class UsuarioBO {
         }
 
         return usuarioDAO.update(usuario);
+
+    }
+
+    public UsuarioTO login(UsuarioTO usuario) {
+        usuarioDAO = new UsuarioDAO();
+
+        if (usuario == null || usuario.getEmail() == null || usuario.getEmail().isBlank() ||
+                usuario.getSenha() == null || usuario.getSenha().isBlank()) {
+
+            throw new IllegalArgumentException("Informe seu e-mail e sua senha.");
+        }
+
+        UsuarioTO resultado = usuarioDAO.login(usuario.getEmail().trim(), usuario.getSenha());
+        if (resultado == null) {
+            throw new IllegalArgumentException("E-mail ou senha incorretos.");
+        }
+
+        return resultado;
     }
 }

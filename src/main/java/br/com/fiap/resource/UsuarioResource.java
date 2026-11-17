@@ -73,4 +73,20 @@ public class UsuarioResource {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erro interno ao atualizar usuário");
         }
     }
+
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody UsuarioTO usuario) {
+
+        try {
+            UsuarioTO resultado = usuarioBO.login(usuario);
+            if (resultado == null) {return ResponseEntity.status(HttpStatus.NOT_FOUND).body("E-mail ou senha incorretos.");
+            }
+            return ResponseEntity.status(HttpStatus.OK).body(resultado);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Não foi possível acessar sua conta neste momento.");
+        }
+    }
 }
