@@ -64,4 +64,22 @@ public class AdministrativoBO {
 
         return administrativoDAO.update(administrativo);
     }
+
+    public AdministrativoTO login(AdministrativoTO administrador) {
+        administrativoDAO = new AdministrativoDAO();
+
+        if (administrador == null || administrador.getEmail() == null || administrador.getEmail().isBlank() ||
+                administrador.getSenha() == null || administrador.getSenha().isBlank()) {
+
+            throw new IllegalArgumentException("Informe seu e-mail e sua senha.");
+        }
+
+        AdministrativoTO resultado = administrativoDAO.login(administrador.getEmail().trim(), administrador.getSenha());
+        if (resultado == null) {
+            throw new IllegalArgumentException("E-mail ou senha incorretos.");
+        }
+
+        return resultado;
+    }
+
 }

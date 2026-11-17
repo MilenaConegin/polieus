@@ -125,4 +125,37 @@ public class AdministrativoDAO {
         }
         return null;
     }
+
+    public AdministrativoTO login(String email, String senha) {
+        AdministrativoTO administrador = new AdministrativoTO();
+        String sql = "select id_admin, nome, email, instituicao, cargo, cd_convite from ddd_cadastro_administrativo where email = ? and senha = ?";
+        try (PreparedStatement ps = ConnectionFactory.getConnection().prepareStatement(sql)) {
+            ps.setString(1, email);
+            ps.setString(2, senha);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                administrador.setIdAdmin(rs.getInt("id_admin"));
+                administrador.setNomeAdmin(rs.getString("nome"));
+                administrador.setEmail(rs.getString("email"));
+                administrador.setInstituicao(rs.getString("instituicao"));
+                administrador.setCargo(rs.getString("cargo"));
+                administrador.setCdConvite(rs.getString("cd_convite"));
+            } else {
+                return null;
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao realizar login: " + e.getMessage());
+        } finally {
+            ConnectionFactory.closeConnection();
+        }
+        return administrador;
+    }
+
+
+
+
+
+
+
+
 }

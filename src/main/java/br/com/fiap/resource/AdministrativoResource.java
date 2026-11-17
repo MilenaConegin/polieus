@@ -76,4 +76,24 @@ public class AdministrativoResource {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erro interno ao atualizar administrador");
         }
     }
+
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody AdministrativoTO administrador) {
+
+        try {
+            AdministrativoTO resultado = administrativoBO.login(administrador);
+            if (resultado == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("E-mail ou senha incorretos.");
+            }
+            return ResponseEntity.status(HttpStatus.OK).body(resultado);
+
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Erro ao atualizar usuário");
+        }catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Não foi possível acessar sua conta neste momento.");
+        }
+    }
 }
