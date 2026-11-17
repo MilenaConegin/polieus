@@ -8,7 +8,7 @@ import jakarta.validation.constraints.Size;
 public class AdministrativoTO {
     private Integer idAdmin;
 
-    @NotBlank   
+    @NotBlank
     private String nomeAdmin;
 
     @Email

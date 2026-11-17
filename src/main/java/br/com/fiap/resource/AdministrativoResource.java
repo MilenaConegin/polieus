@@ -62,7 +62,7 @@ public class AdministrativoResource {
         }
     }
 
-    @PutMapping("/{idUsuario}")
+    @PutMapping("/{idAdmin}")
     public ResponseEntity<?> update(@PathVariable Integer idAdmin ,@Valid @RequestBody AdministrativoTO administrativo) {
         try {
             administrativo.setIdAdmin(idAdmin);
