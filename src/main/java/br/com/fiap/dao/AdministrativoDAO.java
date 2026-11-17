@@ -11,7 +11,7 @@ import java.util.ArrayList;
 public class AdministrativoDAO {
 
     public AdministrativoTO save(AdministrativoTO administrativo) {
-        String sql = "insert into ddd_cadastro_administrativo(nome ,email, instituicao, cargo, cd_convite, senha) values(?,?,?,?,?)";
+        String sql = "insert into ddd_cadastro_administrativo(nome ,email, instituicao, cargo, cd_convite, senha) values(?,?,?,?,?, ?)";
         try (PreparedStatement ps = ConnectionFactory.getConnection().prepareStatement(sql)) {
             ps.setString(1, administrativo.getNomeAdmin());
             ps.setString(2, administrativo.getEmail());
