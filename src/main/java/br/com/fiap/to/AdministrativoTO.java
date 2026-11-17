@@ -8,6 +8,7 @@ import jakarta.validation.constraints.Size;
 public class AdministrativoTO {
     private Integer idAdmin;
 
+    @NotBlank   
     private String nomeAdmin;
 
     @Email
@@ -37,7 +38,7 @@ public class AdministrativoTO {
 
     public AdministrativoTO(Integer idAdmin, String nomeAdmin, String email, String instituicao, String cargo, String cdConvite, String senha) {
         setIdAdmin(idAdmin);
-
+        setNomeAdmin(nomeAdmin);
         setEmail(email);
         setInstituicao(instituicao);
         setCargo(cargo);
