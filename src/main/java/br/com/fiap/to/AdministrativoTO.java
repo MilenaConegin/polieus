@@ -8,6 +8,8 @@ import jakarta.validation.constraints.Size;
 public class AdministrativoTO {
     private Integer idAdmin;
 
+    private String nomeAdmin;
+
     @Email
     @NotBlank
     private String email;
@@ -33,8 +35,9 @@ public class AdministrativoTO {
 
     }
 
-    public AdministrativoTO(Integer idAdmin, String email, String instituicao, String cargo, String cdConvite, String senha) {
+    public AdministrativoTO(Integer idAdmin, String nomeAdmin, String email, String instituicao, String cargo, String cdConvite, String senha) {
         setIdAdmin(idAdmin);
+
         setEmail(email);
         setInstituicao(instituicao);
         setCargo(cargo);
@@ -48,6 +51,14 @@ public class AdministrativoTO {
 
     public void setIdAdmin(Integer idAdmin) {
         this.idAdmin = idAdmin;
+    }
+
+    public String getNomeAdmin() {
+        return nomeAdmin;
+    }
+
+    public void setNomeAdmin(String nomeAdmin) {
+        this.nomeAdmin = nomeAdmin;
     }
 
     public String getEmail() {
