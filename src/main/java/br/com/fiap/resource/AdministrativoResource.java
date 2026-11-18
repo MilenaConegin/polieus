@@ -55,10 +55,16 @@ public class AdministrativoResource {
 
     @DeleteMapping("/{idAdmin}")
     public ResponseEntity<String> delete(@PathVariable Integer idAdmin) {
-        if (administrativoBO.delete(idAdmin)){
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Administrador deletado com sucesso!");
-        }else{
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Administrador não encontrado!");
+        try {
+             if (administrativoBO.delete(idAdmin)){
+                return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Administrador deletado com sucesso!");
+             }else{
+               return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Administrador não encontrado!");
+             }
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erro interno ao excluir ocorrência");
         }
     }
 
@@ -67,7 +73,7 @@ public class AdministrativoResource {
         try {
             administrativo.setIdAdmin(idAdmin);
             AdministrativoTO resultado = administrativoBO.update(administrativo);
-            return ResponseEntity.status(HttpStatus.CREATED).body(resultado);
+            return ResponseEntity.status(HttpStatus.OK).body(resultado);
         }catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         } catch (RuntimeException e) {
@@ -85,7 +91,7 @@ public class AdministrativoResource {
             if (resultado == null) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("E-mail ou senha incorretos.");
             }
-            return ResponseEntity.status(HttpStatus.OK).body(resultado);
+            return ResponseEntity.status(HttpStatus.CREATED).body(resultado);
 
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());

@@ -52,20 +52,31 @@ public class RelatorioResource {
 
     @DeleteMapping("/{idRelatorio}")
     public ResponseEntity<String> delete(@PathVariable Integer idRelatorio){
-        if (relatorioBO.delete(idRelatorio)){
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Relatório deletado com sucesso!");
-        }else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Relatório não encontrado!");
+        try {
+            if (relatorioBO.delete(idRelatorio)) {
+                return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Relatório deletado com sucesso!");
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Relatório não encontrado!");
+            }
+        }  catch (IllegalStateException e) {
+             return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+        }  catch (Exception e) {
+             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erro interno ao excluir histórico");
         }
     }
+
 
     @PutMapping("/{idRelatorio}")
     public ResponseEntity<?> update(@PathVariable Integer idRelatorio, @RequestBody @Valid RelatorioTO relatorio){
         try{
             relatorio.setIdRelatorio(idRelatorio);
             RelatorioTO resultado = relatorioBO.update(relatorio);
-            return ResponseEntity.status(HttpStatus.CREATED).body(resultado);
 
+            if (resultado != null){
+                return ResponseEntity.status(HttpStatus.OK).body(resultado);
+            }else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Relatório não encontrado.");
+            }
         }catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         } catch (RuntimeException e) {

@@ -52,10 +52,16 @@ public class AnaliseResource {
 
     @DeleteMapping("/{idAnalise}")
     public ResponseEntity<String> delete(@PathVariable Integer idAnalise) {
-        if (analiseBO.delete(idAnalise)) {
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Análise deletada com sucesso!");
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Análise não encontrada!");
+        try {
+            if (analiseBO.delete(idAnalise)) {
+                return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Análise deletada com sucesso!");
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Análise não encontrada!");
+            }
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erro interno ao excluir ocorrência");
         }
     }
 
@@ -64,7 +70,12 @@ public class AnaliseResource {
         try {
             analise.setIdAnalise(idAnalise);
             AnaliseTO resultado = analiseBO.update(analise);
-            return ResponseEntity.status(HttpStatus.CREATED).body(resultado);
+
+            if (resultado != null){
+                return ResponseEntity.status(HttpStatus.OK).body(resultado);
+            }else{
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Análise não encontrada!");
+            }
         }catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }catch (RuntimeException e) {

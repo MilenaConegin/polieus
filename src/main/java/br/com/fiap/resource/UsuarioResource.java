@@ -52,10 +52,16 @@ public class UsuarioResource {
 
     @DeleteMapping("/{idUsuario}")
     public ResponseEntity<String> delete(@PathVariable Integer idUsuario) {
-        if (usuarioBO.delete(idUsuario)) {
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Usuário deletado com sucesso!");
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Usuário não encontrado!");
+        try {
+            if (usuarioBO.delete(idUsuario)) {
+                return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Usuário deletado com sucesso!");
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Usuário não encontrado!");
+            }
+        }catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+        }  catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erro interno ao excluir histórico");
         }
     }
 
@@ -64,7 +70,12 @@ public class UsuarioResource {
         try {
             usuario.setIdUsuario(idUsuario);
             UsuarioTO resultado = usuarioBO.update(usuario);
-            return ResponseEntity.status(HttpStatus.CREATED).body(resultado);
+
+            if (resultado != null){
+                return ResponseEntity.status(HttpStatus.OK).body(resultado);
+            }else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Usuário não encontrado.");
+            }
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         } catch (RuntimeException e) {
@@ -79,9 +90,10 @@ public class UsuarioResource {
 
         try {
             UsuarioTO resultado = usuarioBO.login(usuario);
-            if (resultado == null) {return ResponseEntity.status(HttpStatus.NOT_FOUND).body("E-mail ou senha incorretos.");
+            if (resultado == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("E-mail ou senha incorretos.");
             }
-            return ResponseEntity.status(HttpStatus.OK).body(resultado);
+            return ResponseEntity.status(HttpStatus.CREATED).body(resultado);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         } catch (Exception e) {
