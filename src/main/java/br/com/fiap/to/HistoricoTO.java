@@ -1,15 +1,21 @@
+
 package br.com.fiap.to;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.*;
-import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
 
 public class HistoricoTO {
+
     private Integer idHistorico;
 
+    @NotNull
+    @Positive
+    private Integer idOcorrencia;
+
     @NotBlank
+    @Size(max = 30)
     private String protocolo;
 
     @NotBlank
@@ -28,12 +34,12 @@ public class HistoricoTO {
     )
     private String status;
 
-    public HistoricoTO(){
-
+    public HistoricoTO() {
     }
 
-    public HistoricoTO(Integer idHistorico, String protocolo, String categoria, LocalDate data, String status) {
+    public HistoricoTO(Integer idHistorico, Integer idOcorrencia, String protocolo, String categoria, LocalDate data, String status) {
         setIdHistorico(idHistorico);
+        setIdOcorrencia(idOcorrencia);
         setProtocolo(protocolo);
         setCategoria(categoria);
         setData(data);
@@ -46,6 +52,14 @@ public class HistoricoTO {
 
     public void setIdHistorico(Integer idHistorico) {
         this.idHistorico = idHistorico;
+    }
+
+    public Integer getIdOcorrencia() {
+        return idOcorrencia;
+    }
+
+    public void setIdOcorrencia(Integer idOcorrencia) {
+        this.idOcorrencia = idOcorrencia;
     }
 
     public String getProtocolo() {

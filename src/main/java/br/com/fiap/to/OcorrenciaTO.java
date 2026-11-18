@@ -1,9 +1,16 @@
+
 package br.com.fiap.to;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+
 
 public class OcorrenciaTO {
+
     private Integer idOcorrencia;
+
+    @NotNull
+    private Integer idUsuario;
 
     @NotBlank
     private String categoria;
@@ -20,13 +27,13 @@ public class OcorrenciaTO {
     @NotBlank
     private String cep;
 
-
-    public OcorrenciaTO(){
+    public OcorrenciaTO() {
 
     }
 
-    public OcorrenciaTO(Integer idOcorrencia, String categoria, String descricao, String endereco, String departamento, String cep) {
+    public OcorrenciaTO(Integer idOcorrencia, Integer idUsuario, String categoria, String descricao, String endereco, String departamento, String cep) {
         setIdOcorrencia(idOcorrencia);
+        setIdUsuario(idUsuario);
         setCategoria(categoria);
         setDescricao(descricao);
         setEndereco(endereco);
@@ -40,6 +47,14 @@ public class OcorrenciaTO {
 
     public void setIdOcorrencia(Integer idOcorrencia) {
         this.idOcorrencia = idOcorrencia;
+    }
+
+    public Integer getIdUsuario() {
+        return idUsuario;
+    }
+
+    public void setIdUsuario(Integer idUsuario) {
+        this.idUsuario = idUsuario;
     }
 
     public String getCategoria() {
