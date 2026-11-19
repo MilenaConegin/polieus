@@ -1,6 +1,8 @@
 
 package br.com.fiap.bo;
 
+import br.com.fiap.model.Usuario;
+import org.modelmapper.ModelMapper;
 import br.com.fiap.dao.UsuarioDAO;
 import br.com.fiap.exception.RecursoNaoEncontradoException;
 import br.com.fiap.to.UsuarioTO;
@@ -12,9 +14,11 @@ import java.util.ArrayList;
 public class UsuarioBO {
 
     private final UsuarioDAO usuarioDAO;
+    private final ModelMapper modelMapper;
 
-    public UsuarioBO(UsuarioDAO usuarioDAO) {
+    public UsuarioBO(UsuarioDAO usuarioDAO, ModelMapper modelMapper) {
         this.usuarioDAO = usuarioDAO;
+        this.modelMapper = modelMapper;
     }
 
     public UsuarioTO save(UsuarioTO usuario) {
@@ -36,11 +40,22 @@ public class UsuarioBO {
             throw new IllegalArgumentException("A senha deve conter pelo menos 8 caracteres, um número, uma letra maiúscula, uma letra minúscula e um caractere especial.");
         }
 
-        return usuarioDAO.save(usuario);
+        Usuario model = modelMapper.map(usuario, Usuario.class);
+
+        Usuario salvo = usuarioDAO.save(model);
+
+        return converterParaTO(salvo);
     }
 
     public ArrayList<UsuarioTO> findAll() {
-        return usuarioDAO.findAll();
+        ArrayList<Usuario> usuarios = usuarioDAO.findAll();
+        ArrayList<UsuarioTO> usuariosTO = new ArrayList<>();
+
+        for (Usuario usuario : usuarios) {
+            usuariosTO.add(converterParaTO(usuario));
+        }
+
+        return usuariosTO;
     }
 
     public UsuarioTO findById(Integer idUsuario) {
@@ -49,13 +64,13 @@ public class UsuarioBO {
             throw new IllegalArgumentException("Informe um ID válido.");
         }
 
-        UsuarioTO usuario = usuarioDAO.findById(idUsuario);
+        Usuario usuario = usuarioDAO.findById(idUsuario);
 
         if (usuario == null) {
             throw new RecursoNaoEncontradoException("Usuário não encontrado!");
         }
 
-        return usuario;
+        return converterParaTO(usuario);
     }
 
     public boolean delete(Integer idUsuario) {
@@ -93,7 +108,15 @@ public class UsuarioBO {
             throw new IllegalArgumentException("A senha deve conter pelo menos 8 caracteres, um número, uma letra maiúscula, uma letra minúscula e um caractere especial.");
         }
 
-        return usuarioDAO.update(usuario);
+        Usuario model = modelMapper.map(usuario, Usuario.class);
+
+        Usuario atualizado = usuarioDAO.update(model);
+
+        if (atualizado == null) {
+            throw new RecursoNaoEncontradoException("Usuário não encontrado!");
+        }
+
+        return converterParaTO(atualizado);
 
     }
 
@@ -105,11 +128,23 @@ public class UsuarioBO {
             throw new IllegalArgumentException("Informe seu e-mail e sua senha.");
         }
 
-        UsuarioTO resultado = usuarioDAO.login(usuario.getEmail().trim(), usuario.getSenha());
+        Usuario resultado = usuarioDAO.login(
+                usuario.getEmail().trim(),
+                usuario.getSenha()
+        );
+
         if (resultado == null) {
             throw new IllegalArgumentException("E-mail ou senha incorretos.");
         }
 
-        return resultado;
+        return converterParaTO(resultado);
     }
+
+    private UsuarioTO converterParaTO(Usuario usuario) {
+
+        UsuarioTO usuarioTO = modelMapper.map(usuario, UsuarioTO.class);
+
+        return usuarioTO;
+    }
+
 }

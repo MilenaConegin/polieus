@@ -3,7 +3,9 @@ package br.com.fiap.bo;
 
 import br.com.fiap.dao.OcorrenciaDAO;
 import br.com.fiap.exception.RecursoNaoEncontradoException;
+import br.com.fiap.model.Ocorrencia;
 import br.com.fiap.to.OcorrenciaTO;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -13,11 +15,12 @@ public class OcorrenciaBO {
 
 
     private final OcorrenciaDAO ocorrenciaDAO;
+    private final ModelMapper modelMapper;
 
-    public OcorrenciaBO(OcorrenciaDAO ocorrenciaDAO) {
+    public OcorrenciaBO(OcorrenciaDAO ocorrenciaDAO, ModelMapper modelMapper) {
         this.ocorrenciaDAO = ocorrenciaDAO;
+        this.modelMapper = modelMapper;
     }
-
     public OcorrenciaTO save(OcorrenciaTO ocorrencia) {
 
 
@@ -49,12 +52,23 @@ public class OcorrenciaBO {
             throw new IllegalArgumentException("CEP não informado!");
         }
 
-        return ocorrenciaDAO.save(ocorrencia);
+        Ocorrencia model = modelMapper.map(ocorrencia, Ocorrencia.class);
+
+        Ocorrencia resultado = ocorrenciaDAO.save(model);
+
+        return modelMapper.map(resultado, OcorrenciaTO.class);
     }
 
     public ArrayList<OcorrenciaTO> findAll() {
 
-        return ocorrenciaDAO.findAll();
+        ArrayList<Ocorrencia> listaModel = ocorrenciaDAO.findAll();
+        ArrayList<OcorrenciaTO> listaTO = new ArrayList<>();
+
+        for (Ocorrencia ocorrencia : listaModel) {
+            listaTO.add(modelMapper.map(ocorrencia, OcorrenciaTO.class));
+        }
+
+        return listaTO;
     }
 
     public OcorrenciaTO findById(Integer idOcorrencia) {
@@ -63,13 +77,13 @@ public class OcorrenciaBO {
             throw new IllegalArgumentException("ID da ocorrência inválido!");
         }
 
-        OcorrenciaTO ocorrencia = ocorrenciaDAO.findById(idOcorrencia);
+        Ocorrencia ocorrencia = ocorrenciaDAO.findById(idOcorrencia);
 
         if (ocorrencia == null) {
             throw new RecursoNaoEncontradoException("Ocorrência não encontrada!");
         }
 
-        return ocorrenciaDAO.findById(idOcorrencia);
+        return modelMapper.map(ocorrencia, OcorrenciaTO.class);
     }
 
     public ArrayList<OcorrenciaTO> findByUsuario(Integer idUsuario) {
@@ -78,7 +92,14 @@ public class OcorrenciaBO {
             throw new IllegalArgumentException("ID do usuário inválido!");
         }
 
-        return ocorrenciaDAO.findByUsuario(idUsuario);
+        ArrayList<Ocorrencia> listaModel = ocorrenciaDAO.findByUsuario(idUsuario);
+        ArrayList<OcorrenciaTO> listaTO = new ArrayList<>();
+
+        for (Ocorrencia ocorrencia : listaModel) {
+            listaTO.add(modelMapper.map(ocorrencia, OcorrenciaTO.class));
+        }
+
+        return listaTO;
     }
 
     public boolean delete(Integer idOcorrencia) {
@@ -87,11 +108,13 @@ public class OcorrenciaBO {
             throw new IllegalArgumentException("ID da ocorrência inválido!");
         }
 
-        if (!ocorrenciaDAO.delete(idOcorrencia)) {
+        boolean excluido = ocorrenciaDAO.delete(idOcorrencia);
+
+        if (!excluido) {
             throw new RecursoNaoEncontradoException("Ocorrência não encontrada!");
         }
 
-        return ocorrenciaDAO.delete(idOcorrencia);
+        return true;
     }
 
     public OcorrenciaTO update(OcorrenciaTO ocorrencia) {
@@ -128,6 +151,14 @@ public class OcorrenciaBO {
             throw new IllegalArgumentException("CEP não informado!");
         }
 
-        return ocorrenciaDAO.update(ocorrencia);
+        Ocorrencia model = modelMapper.map(ocorrencia, Ocorrencia.class);
+
+        Ocorrencia resultado = ocorrenciaDAO.update(model);
+
+        if (resultado == null) {
+            throw new RecursoNaoEncontradoException("Ocorrência não encontrada!");
+        }
+
+        return modelMapper.map(resultado, OcorrenciaTO.class);
     }
 }

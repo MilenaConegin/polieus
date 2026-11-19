@@ -3,7 +3,9 @@ package br.com.fiap.bo;
 
 import br.com.fiap.dao.RelatorioDAO;
 import br.com.fiap.exception.RecursoNaoEncontradoException;
+import br.com.fiap.model.Relatorio;
 import br.com.fiap.to.RelatorioTO;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -12,9 +14,11 @@ import java.util.ArrayList;
 public class RelatorioBO {
 
     private final RelatorioDAO relatorioDAO;
+    private final ModelMapper modelMapper;
 
-    public RelatorioBO(RelatorioDAO relatorioDAO) {
+    public RelatorioBO(RelatorioDAO relatorioDAO, ModelMapper modelMapper) {
         this.relatorioDAO = relatorioDAO;
+        this.modelMapper = modelMapper;
     }
 
     public RelatorioTO save(RelatorioTO relatorio){
@@ -35,39 +39,49 @@ public class RelatorioBO {
             throw new IllegalArgumentException("Informe uma prioridade válida (Alta, Média ou Baixa).");
         }
 
-        return relatorioDAO.save(relatorio);
+        Relatorio model = modelMapper.map(relatorio, Relatorio.class);
+
+        Relatorio resultado = relatorioDAO.save(model);
+
+        return modelMapper.map(resultado, RelatorioTO.class);
     }
 
     public ArrayList<RelatorioTO> findAll(){
-        return relatorioDAO.findAll();
+        ArrayList<Relatorio> listaModel = relatorioDAO.findAll();
+        ArrayList<RelatorioTO> listaTO = new ArrayList<>();
+
+        for (Relatorio relatorio : listaModel) {
+            listaTO.add(modelMapper.map(relatorio, RelatorioTO.class));
+        }
+
+        return listaTO;
     }
 
     public RelatorioTO findById(Integer idRelatorio){
 
-        if (idRelatorio == null || idRelatorio <= 0){
+        if (idRelatorio == null || idRelatorio <= 0) {
             throw new IllegalArgumentException("Informe um ID válido.");
         }
 
-        RelatorioTO relatorio = relatorioDAO.findById(idRelatorio);
+        Relatorio relatorio = relatorioDAO.findById(idRelatorio);
+
         if (relatorio == null) {
             throw new RecursoNaoEncontradoException("Relatório não encontrado!");
         }
 
-        return relatorio;
+        return modelMapper.map(relatorio, RelatorioTO.class);
     }
 
     public boolean delete(Integer idRelatorio){
 
-        if (idRelatorio == null || idRelatorio <= 0){
+        if (idRelatorio == null || idRelatorio <= 0) {
             throw new IllegalArgumentException("Informe um ID válido.");
         }
 
         boolean excluido = relatorioDAO.delete(idRelatorio);
 
         if (!excluido) {
-            throw new RecursoNaoEncontradoException(
-                    "Relatório não encontrado!"
-            );
+            throw new RecursoNaoEncontradoException("Relatório não encontrado!");
         }
 
         return true;
@@ -96,13 +110,14 @@ public class RelatorioBO {
             throw new IllegalArgumentException("Informe uma prioridade válida.");
         }
 
-        RelatorioTO resultado = relatorioDAO.update(relatorio);
+        Relatorio model = modelMapper.map(relatorio, Relatorio.class);
+
+        Relatorio resultado = relatorioDAO.update(model);
 
         if (resultado == null) {
-            throw new RecursoNaoEncontradoException(
-                    "Relatório não encontrado!"
-            );
+            throw new RecursoNaoEncontradoException("Relatório não encontrado!");
         }
-        return resultado;
+
+        return modelMapper.map(resultado, RelatorioTO.class);
     }
 }

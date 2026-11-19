@@ -2,7 +2,7 @@
 package br.com.fiap.dao;
 
 import br.com.fiap.exception.RegraNegocioException;
-import br.com.fiap.to.HistoricoTO;
+import br.com.fiap.model.Historico;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
@@ -18,7 +18,7 @@ public class HistoricoDAO {
         this.dataSource = dataSource;
     }
 
-    public HistoricoTO save(HistoricoTO historico) {
+    public Historico save(Historico historico) {
         String sql = "insert into ddd_acompanhamento(num_protocolo, ds_categoria, dt_acompanhamento, ds_status, id_ocorrencia) values (?, ?, ?, ?, ?)";
         try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql, new String[]{"id_acompanhamento"})) {
@@ -51,14 +51,14 @@ public class HistoricoDAO {
         }
     }
 
-    public ArrayList<HistoricoTO> findAll() {
-        ArrayList<HistoricoTO> historicos = new ArrayList<HistoricoTO>();
+    public ArrayList<Historico> findAll() {
+        ArrayList<Historico> historicos = new ArrayList<Historico>();
         String sql = "select * from ddd_acompanhamento order by id_acompanhamento";
         try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
-                    HistoricoTO historico = new HistoricoTO();
+                    Historico historico = new Historico();
                     historico.setIdHistorico(rs.getInt("id_acompanhamento"));
                     historico.setIdOcorrencia(rs.getInt("id_ocorrencia"));
                     historico.setProtocolo(rs.getString("num_protocolo"));
@@ -73,8 +73,8 @@ public class HistoricoDAO {
         return historicos;
     }
 
-    public HistoricoTO findById(Integer idHistorico) {
-        HistoricoTO historico = new HistoricoTO();
+    public Historico findById(Integer idHistorico) {
+        Historico historico = new Historico();
         String sql = "select * from ddd_acompanhamento where id_acompanhamento = ?";
         try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -97,8 +97,8 @@ public class HistoricoDAO {
         return historico;
     }
 
-    public ArrayList<HistoricoTO> findByOcorrencia(Integer idOcorrencia) {
-        ArrayList<HistoricoTO> historicos = new ArrayList<HistoricoTO>();
+    public ArrayList<Historico> findByOcorrencia(Integer idOcorrencia) {
+        ArrayList<Historico> historicos = new ArrayList<Historico>();
         String sql = "select * from ddd_acompanhamento where id_ocorrencia = ? order by id_acompanhamento";
         try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -107,7 +107,7 @@ public class HistoricoDAO {
                 if (rs != null) {
                     while (rs.next()) {
 
-                        HistoricoTO historico = new HistoricoTO();
+                        Historico historico = new Historico();
                         historico.setIdHistorico(rs.getInt("id_acompanhamento"));
                         historico.setIdOcorrencia(rs.getInt("id_ocorrencia"));
                         historico.setProtocolo(rs.getString("num_protocolo"));
@@ -142,7 +142,7 @@ public class HistoricoDAO {
         }
     }
 
-    public HistoricoTO update(HistoricoTO historico) {
+    public Historico update(Historico historico) {
         String sql = "update ddd_acompanhamento set num_protocolo = ?, ds_categoria = ?, dt_acompanhamento = ?, " +
                 "ds_status = ?, id_ocorrencia = ? where id_acompanhamento = ?";
 

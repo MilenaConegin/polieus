@@ -4,7 +4,9 @@ package br.com.fiap.bo;
 import br.com.fiap.dao.AdministrativoDAO;
 import br.com.fiap.exception.RecursoNaoEncontradoException;
 import br.com.fiap.exception.RegraNegocioException;
+import br.com.fiap.model.Administrativo;
 import br.com.fiap.to.AdministrativoTO;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -13,11 +15,12 @@ import java.util.ArrayList;
 public class AdministrativoBO {
 
     private final AdministrativoDAO administrativoDAO;
+    private final ModelMapper modelMapper;
 
-    public AdministrativoBO(AdministrativoDAO administrativoDAO) {
+    public AdministrativoBO(AdministrativoDAO administrativoDAO, ModelMapper modelMapper) {
         this.administrativoDAO = administrativoDAO;
+        this.modelMapper = modelMapper;
     }
-
     public AdministrativoTO save(AdministrativoTO administrativo) {
 
         if (administrativo == null) {
@@ -33,18 +36,28 @@ public class AdministrativoBO {
             throw new IllegalArgumentException("A senha deve conter pelo menos 8 caracteres, um número, uma letra maiúscula, uma letra minúscula e um caractere especial.");
         }
 
-        AdministrativoTO resultado = administrativoDAO.save(administrativo);
+        Administrativo model = modelMapper.map(administrativo, Administrativo.class);
+
+        Administrativo resultado = administrativoDAO.save(model);
 
         if (resultado == null) {
             throw new RegraNegocioException("Não foi possível cadastrar o administrador.");
         }
 
-        return resultado;
-
+        return modelMapper.map(resultado, AdministrativoTO.class);
     }
 
     public ArrayList<AdministrativoTO> findAll() {
-        return administrativoDAO.findAll();
+        ArrayList<Administrativo> administradores = administrativoDAO.findAll();
+        ArrayList<AdministrativoTO> resultado = new ArrayList<>();
+
+        for (Administrativo administrador : administradores) {
+            AdministrativoTO to = modelMapper.map(administrador, AdministrativoTO.class);
+
+            resultado.add(to);
+        }
+
+        return resultado;
     }
 
     public AdministrativoTO findById(Integer idAdmin) {
@@ -53,13 +66,16 @@ public class AdministrativoBO {
             throw new IllegalArgumentException("Informe um ID válido.");
         }
 
-        AdministrativoTO administrador = administrativoDAO.findById(idAdmin);
+        Administrativo administrador = administrativoDAO.findById(idAdmin);
 
         if (administrador == null) {
             throw new RecursoNaoEncontradoException("Administrador não encontrado.");
         }
 
-        return administrador;
+        AdministrativoTO resultado = modelMapper.map(administrador, AdministrativoTO.class);
+        resultado.setSenha(null);
+
+        return resultado;
     }
 
     public boolean delete(Integer idAdmin) {
@@ -92,13 +108,17 @@ public class AdministrativoBO {
             throw new IllegalArgumentException("A senha deve conter pelo menos 8 caracteres, um número, uma letra maiúscula, uma letra minúscula e um caractere especial.");
         }
 
-        AdministrativoTO resultado = administrativoDAO.update(administrativo);
+        Administrativo model = modelMapper.map(administrativo, Administrativo.class);
+
+        Administrativo resultado = administrativoDAO.update(model);
 
         if (resultado == null) {
             throw new RecursoNaoEncontradoException("Administrador não encontrado.");
         }
 
-        return resultado;
+        AdministrativoTO to = modelMapper.map(resultado, AdministrativoTO.class);
+
+        return to;
     }
 
     public AdministrativoTO login(AdministrativoTO administrador) {
@@ -109,12 +129,16 @@ public class AdministrativoBO {
             throw new IllegalArgumentException("Informe seu e-mail e sua senha.");
         }
 
-        AdministrativoTO resultado = administrativoDAO.login(administrador.getEmail().trim(), administrador.getSenha());
+        Administrativo resultado = administrativoDAO.login(
+                administrador.getEmail().trim(),
+                administrador.getSenha()
+        );
+
         if (resultado == null) {
             throw new IllegalArgumentException("E-mail ou senha incorretos.");
         }
 
-        return resultado;
+        return modelMapper.map(resultado, AdministrativoTO.class);
     }
 
 }

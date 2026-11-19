@@ -2,7 +2,7 @@
 package br.com.fiap.dao;
 
 import br.com.fiap.exception.RegraNegocioException;
-import br.com.fiap.to.UsuarioTO;
+import br.com.fiap.model.Usuario;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
@@ -21,7 +21,7 @@ public class UsuarioDAO {
         this.dataSource = dataSource;
     }
 
-    public UsuarioTO save(UsuarioTO usuario) {
+    public Usuario save(Usuario usuario) {
         String sql = "insert into ddd_cadastro_usuario(nome, cpf, telefone, email, senha) values(?,?,?,?,?)";
         try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql, new String[]{"id_usuario"})) {
@@ -49,14 +49,14 @@ public class UsuarioDAO {
         }
     }
 
-    public ArrayList<UsuarioTO> findAll() {
-        ArrayList<UsuarioTO> usuarios = new ArrayList<UsuarioTO>();
+    public ArrayList<Usuario> findAll() {
+        ArrayList<Usuario> usuarios = new ArrayList<Usuario>();
         String sql = "select * from ddd_cadastro_usuario order by id_usuario";
         try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()){
                 while (rs.next()) {
-                    UsuarioTO usuario = new UsuarioTO();
+                    Usuario usuario = new Usuario();
                     usuario.setIdUsuario(rs.getInt("id_usuario"));
                     usuario.setNomeUsuario(rs.getString("nome"));
                     usuario.setCpf(rs.getString("cpf"));
@@ -72,8 +72,8 @@ public class UsuarioDAO {
         return usuarios;
     }
 
-    public UsuarioTO findById(Integer idUsuario) {
-        UsuarioTO usuario = new UsuarioTO();
+    public Usuario findById(Integer idUsuario) {
+        Usuario usuario = new Usuario();
         String sql = "select * from ddd_cadastro_usuario where id_usuario = ?";
         try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -114,7 +114,7 @@ public class UsuarioDAO {
         }
     }
 
-    public UsuarioTO update(UsuarioTO usuario) {
+    public Usuario update(Usuario usuario) {
         String sql = "update ddd_cadastro_usuario set nome = ?, cpf = ?, telefone = ?, email = ?, senha = ? where id_usuario = ?";
         try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -140,8 +140,8 @@ public class UsuarioDAO {
         }
     }
 
-    public UsuarioTO login(String email, String senha) {
-        UsuarioTO usuario = new UsuarioTO();
+    public Usuario login(String email, String senha) {
+        Usuario usuario = new Usuario();
         String sql = "select id_usuario, nome, cpf, telefone, email from ddd_cadastro_usuario where email = ? and senha = ?";
         try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {

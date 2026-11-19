@@ -3,7 +3,9 @@ package br.com.fiap.bo;
 
 import br.com.fiap.dao.AnaliseDAO;
 import br.com.fiap.exception.RecursoNaoEncontradoException;
+import br.com.fiap.model.Analise;
 import br.com.fiap.to.AnaliseTO;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -13,9 +15,11 @@ import java.util.ArrayList;
 public class AnaliseBO {
 
     private final AnaliseDAO analiseDAO;
+    private final ModelMapper modelMapper;
 
-    public AnaliseBO(AnaliseDAO analiseDAO) {
+    public AnaliseBO(AnaliseDAO analiseDAO, ModelMapper modelMapper) {
         this.analiseDAO = analiseDAO;
+        this.modelMapper = modelMapper;
     }
 
     public AnaliseTO save(AnaliseTO analise) {
@@ -41,11 +45,22 @@ public class AnaliseBO {
             throw new IllegalArgumentException("Prioridade inválida.");
         }
 
-        return analiseDAO.save(analise);
+        Analise model = modelMapper.map(analise, Analise.class);
+
+        Analise resultado = analiseDAO.save(model);
+
+        return modelMapper.map(resultado, AnaliseTO.class);
     }
 
     public ArrayList<AnaliseTO> findAll() {
-        return analiseDAO.findAll();
+        ArrayList<Analise> analises = analiseDAO.findAll();
+        ArrayList<AnaliseTO> resultado = new ArrayList<>();
+
+        for (Analise analise : analises) {
+            resultado.add(modelMapper.map(analise, AnaliseTO.class));
+        }
+
+        return resultado;
     }
 
     public AnaliseTO findById(Integer idAnalise) {
@@ -54,13 +69,13 @@ public class AnaliseBO {
             throw new IllegalArgumentException("Informe um ID válido.");
         }
 
-        AnaliseTO analise = analiseDAO.findById(idAnalise);
+        Analise analise = analiseDAO.findById(idAnalise);
 
         if (analise == null) {
             throw new RecursoNaoEncontradoException("Análise não encontrada!");
         }
 
-        return analise;
+        return modelMapper.map(analise, AnaliseTO.class);
     }
 
     public boolean delete(Integer idAnalise) {
@@ -105,7 +120,9 @@ public class AnaliseBO {
             throw new IllegalArgumentException("Prioridade inválida.");
         }
 
-        AnaliseTO resultado = analiseDAO.update(analise);
+        Analise model = modelMapper.map(analise, Analise.class);
+
+        Analise resultado = analiseDAO.update(model);
 
         if (resultado == null) {
             throw new RecursoNaoEncontradoException(
@@ -113,6 +130,6 @@ public class AnaliseBO {
             );
         }
 
-        return resultado;
+        return modelMapper.map(resultado, AnaliseTO.class);
     }
 }

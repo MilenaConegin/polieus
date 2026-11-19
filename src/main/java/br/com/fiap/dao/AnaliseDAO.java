@@ -2,7 +2,7 @@
 package br.com.fiap.dao;
 
 import br.com.fiap.exception.RegraNegocioException;
-import br.com.fiap.to.AnaliseTO;
+import br.com.fiap.model.Analise;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
@@ -18,7 +18,7 @@ public class AnaliseDAO {
         this.dataSource = dataSource;
     }
 
-    public AnaliseTO save(AnaliseTO analise) {
+    public Analise save(Analise analise) {
         String sql = "insert into ddd_analise(protocolo, categoria, localizacao, prioridade, status, dt_analise) values(?,?,?,?,?,?)";
         try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql, new String[]{"id_analise"})) {
@@ -52,14 +52,14 @@ public class AnaliseDAO {
         }
     }
 
-    public ArrayList<AnaliseTO> findAll() {
-        ArrayList<AnaliseTO> analises = new ArrayList<AnaliseTO>();
+    public ArrayList<Analise> findAll() {
+        ArrayList<Analise> analises = new ArrayList<Analise>();
         String sql = "select * from ddd_analise order by id_analise";
         try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
             ResultSet rs = ps.executeQuery()){
                   while (rs.next()) {
-                    AnaliseTO analise = new AnaliseTO();
+                    Analise analise = new Analise();
                     analise.setIdAnalise(rs.getInt("id_analise"));
                     analise.setProtocolo(rs.getString("protocolo"));
                     analise.setCategoria(rs.getString("categoria"));
@@ -75,8 +75,8 @@ public class AnaliseDAO {
         return analises;
     }
 
-    public AnaliseTO findById(Integer idAnalise) {
-        AnaliseTO analise = new AnaliseTO();
+    public Analise findById(Integer idAnalise) {
+        Analise analise = new Analise();
         String sql = "select * from ddd_analise where id_analise = ?";
         try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -116,7 +116,7 @@ public class AnaliseDAO {
         }
     }
 
-    public AnaliseTO update(AnaliseTO analise) {
+    public Analise update(Analise analise) {
         String sql = "update ddd_analise set protocolo = ?, categoria = ?, localizacao = ?, prioridade = ?, status = ?, dt_analise = ? where id_analise = ?";
         try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {

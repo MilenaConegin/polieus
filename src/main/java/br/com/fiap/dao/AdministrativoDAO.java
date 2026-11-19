@@ -2,7 +2,7 @@
 package br.com.fiap.dao;
 
 import br.com.fiap.exception.RegraNegocioException;
-import br.com.fiap.to.AdministrativoTO;
+import br.com.fiap.model.Administrativo;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
@@ -21,7 +21,7 @@ public class AdministrativoDAO {
         this.dataSource = dataSource;
     }
 
-    public AdministrativoTO save(AdministrativoTO administrativo) {
+    public Administrativo save(Administrativo administrativo) {
         String sql = "insert into ddd_cadastro_administrativo(nome ,email, instituicao, cargo, cd_convite, senha) values(?,?,?,?,?, ?)";
         try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql, new String[]{"id_admin"})) {
@@ -52,15 +52,15 @@ public class AdministrativoDAO {
         }
     }
 
-    public ArrayList<AdministrativoTO> findAll() {
-        ArrayList<AdministrativoTO> administrativos = new ArrayList<AdministrativoTO>();
+    public ArrayList<Administrativo> findAll() {
+        ArrayList<Administrativo> administrativos = new ArrayList<Administrativo>();
         String sql = "select * from ddd_cadastro_administrativo order by id_admin";
         try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
 
                 while (rs.next()) {
-                    AdministrativoTO administrativo = new AdministrativoTO();
+                    Administrativo administrativo = new Administrativo();
                     administrativo.setIdAdmin(rs.getInt("id_admin"));
                     administrativo.setNomeAdmin(rs.getString("nome"));
                     administrativo.setEmail(rs.getString("email"));
@@ -79,8 +79,8 @@ public class AdministrativoDAO {
         return administrativos;
     }
 
-    public AdministrativoTO findById(Integer idAdmin) {
-        AdministrativoTO administrativo = new AdministrativoTO();
+    public Administrativo findById(Integer idAdmin) {
+        Administrativo administrativo = new Administrativo();
         String sql = "select * from ddd_cadastro_administrativo where id_admin = ?";
         try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -122,7 +122,7 @@ public class AdministrativoDAO {
         }
     }
 
-    public AdministrativoTO update(AdministrativoTO administrativo) {
+    public Administrativo update(Administrativo administrativo) {
         String sql = "update ddd_cadastro_administrativo set nome = ?, email = ?, instituicao = ?, cargo = ?, cd_convite = ?, senha = ? where id_admin = ?";
         try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -149,8 +149,8 @@ public class AdministrativoDAO {
         }
     }
 
-    public AdministrativoTO login(String email, String senha) {
-        AdministrativoTO administrador = new AdministrativoTO();
+    public Administrativo login(String email, String senha) {
+        Administrativo administrador = new Administrativo();
         String sql = "select id_admin, nome, email, instituicao, cargo, cd_convite from ddd_cadastro_administrativo where email = ? and senha = ?";
         try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {

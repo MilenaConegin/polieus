@@ -2,7 +2,7 @@
 package br.com.fiap.dao;
 
 import br.com.fiap.exception.RegraNegocioException;
-import br.com.fiap.to.OcorrenciaTO;
+import br.com.fiap.model.Ocorrencia;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
@@ -20,8 +20,7 @@ public class OcorrenciaDAO {
     public OcorrenciaDAO(DataSource dataSource) {
         this.dataSource = dataSource;
     }
-
-    public OcorrenciaTO save(OcorrenciaTO ocorrencia) {
+    public Ocorrencia save(Ocorrencia ocorrencia) {
         String sql = "insert into ddd_ocorrencia (id_usuario, ds_categoria, ds_descricao, ds_endereco, num_departamento, num_cep) values (?, ?, ?, ?, ?, ?)";
         try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql, new String[]{"id_ocorrencia"})) {
@@ -54,14 +53,14 @@ public class OcorrenciaDAO {
         }
     }
 
-    public ArrayList<OcorrenciaTO> findAll() {
-        ArrayList<OcorrenciaTO> ocorrencias = new ArrayList<OcorrenciaTO>();
+    public ArrayList<Ocorrencia> findAll() {
+        ArrayList<Ocorrencia> ocorrencias = new ArrayList<Ocorrencia>();
         String sql = "select * from ddd_ocorrencia order by id_ocorrencia";
         try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
             ResultSet rs = ps.executeQuery()) {
                   while (rs.next()) {
-                     OcorrenciaTO ocorrencia = new OcorrenciaTO();
+                     Ocorrencia ocorrencia = new Ocorrencia();
                      ocorrencia.setIdOcorrencia(rs.getInt("id_ocorrencia"));
                      ocorrencia.setIdUsuario(rs.getInt("id_usuario"));
                      ocorrencia.setCategoria(rs.getString("ds_categoria"));
@@ -77,8 +76,8 @@ public class OcorrenciaDAO {
         return ocorrencias;
     }
 
-    public OcorrenciaTO findById(Integer idOcorrencia) {
-        OcorrenciaTO ocorrencia = new OcorrenciaTO();
+    public Ocorrencia findById(Integer idOcorrencia) {
+        Ocorrencia ocorrencia = new Ocorrencia();
         String sql = "select * from ddd_ocorrencia where id_ocorrencia = ?";
         try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -103,8 +102,8 @@ public class OcorrenciaDAO {
         return ocorrencia;
     }
 
-    public ArrayList<OcorrenciaTO> findByUsuario(Integer idUsuario) {
-        ArrayList<OcorrenciaTO> ocorrencias = new ArrayList<OcorrenciaTO>();
+    public ArrayList<Ocorrencia> findByUsuario(Integer idUsuario) {
+        ArrayList<Ocorrencia> ocorrencias = new ArrayList<Ocorrencia>();
         String sql = "select * from ddd_ocorrencia where id_usuario = ? order by id_ocorrencia";
         try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -113,7 +112,7 @@ public class OcorrenciaDAO {
             if (rs != null) {
                  while (rs.next()) {
 
-                    OcorrenciaTO ocorrencia = new OcorrenciaTO();
+                    Ocorrencia ocorrencia = new Ocorrencia();
                     ocorrencia.setIdOcorrencia(rs.getInt("id_ocorrencia"));
                     ocorrencia.setIdUsuario(rs.getInt("id_usuario"));
                     ocorrencia.setCategoria(rs.getString("ds_categoria"));
@@ -144,7 +143,7 @@ public class OcorrenciaDAO {
         }
     }
 
-    public OcorrenciaTO update(OcorrenciaTO ocorrencia) {
+    public Ocorrencia update(Ocorrencia ocorrencia) {
         String sql = "update ddd_ocorrencia set id_usuario = ?, ds_categoria = ?, ds_descricao = ?, " +
                 "ds_endereco = ?, num_departamento = ?, num_cep = ? where id_ocorrencia = ?";
 
