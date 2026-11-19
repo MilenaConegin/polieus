@@ -1,0 +1,142 @@
+Script SQL 
+
+CREATE TABLE ddd_acompanhamento ( 
+
+    id_acompanhamento NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY, 
+
+    num_protocolo VARCHAR2(30) NOT NULL, 
+
+    ds_categoria VARCHAR2(100) NOT NULL, 
+
+    dt_acompanhamento DATE NOT NULL, 
+
+    ds_status VARCHAR2(50) DEFAULT 'Pendente' NOT NULL, 
+
+    id_ocorrencia NUMBER NOT NULL, 
+
+  
+
+    CONSTRAINT fk_acompanhamento_ocorrencia 
+
+    FOREIGN KEY (id_ocorrencia) 
+
+    REFERENCES ddd_ocorrencia(id_ocorrencia), 
+
+  
+
+    CONSTRAINT chk_acompanhamento_status 
+
+    CHECK (ds_status IN ('Pendente', 'Em análise', 'Em andamento', 'Concluído')) 
+
+); 
+
+
+CREATE TABLE ddd_ocorrencia ( 
+
+    id_ocorrencia NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY, 
+
+    id_usuario NUMBER NOT NULL, 
+
+    ds_categoria VARCHAR2(100) NOT NULL, 
+
+    ds_descricao VARCHAR2(100) NOT NULL, 
+
+    ds_endereco VARCHAR2(200) NOT NULL, 
+
+    num_departamento VARCHAR2(50) NOT NULL, 
+
+    num_cep VARCHAR2(9) NOT NULL, 
+
+  
+
+    CONSTRAINT fk_ocorrencia_usuario 
+
+    FOREIGN KEY (id_usuario) 
+
+    REFERENCES ddd_cadastro_usuario(id_usuario) 
+
+); 
+
+
+CREATE TABLE ddd_cadastro_administrativo( 
+
+id_admin NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY, 
+
+nome VARCHAR2(100) NOT NULL, 
+
+email VARCHAR2(100) NOT NULL UNIQUE, 
+
+instituicao VARCHAR2(100) NOT NULL, 
+
+cargo VARCHAR2(50) NOT NULL, 
+
+cd_convite VARCHAR2(20) NOT NULL UNIQUE, 
+
+senha VARCHAR2(100) NOT NULL 
+
+); 
+
+
+CREATE TABLE ddd_relatorio( 
+
+    id_relatorio NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY, 
+
+    id_ocorrencia NUMBER NOT NULL, 
+
+    categoria VARCHAR2(100) NOT NULL, 
+
+    prioridade VARCHAR2(20) DEFAULT 'Média' NOT NULL, 
+
+  
+
+    CHECK (prioridade IN ('Alta', 'Média', 'Baixa')), 
+
+  
+
+    CONSTRAINT fk_relatorio_ocorrencia 
+
+    FOREIGN KEY (id_ocorrencia) 
+
+    REFERENCES ddd_ocorrencia(id_ocorrencia) 
+
+); 
+
+
+CREATE TABLE ddd_cadastro_usuario ( 
+
+    id_usuario NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY, 
+
+    nome VARCHAR2(100) NOT NULL, 
+
+    cpf VARCHAR2(11) NOT NULL UNIQUE, 
+
+    telefone VARCHAR2(20) NOT NULL, 
+
+    email VARCHAR2(100) NOT NULL UNIQUE, 
+
+    senha VARCHAR2(100) NOT NULL 
+
+); 
+
+
+CREATE TABLE ddd_analise( 
+
+id_analise NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY, 
+
+protocolo VARCHAR2(30) NOT NULL, 
+
+categoria VARCHAR2(100)NOT NULL,  
+
+localizacao  VARCHAR2(200)NOT NULL,  
+
+prioridade VARCHAR2(20) DEFAULT 'Média' NOT NULL, 
+
+CHECK (prioridade IN  ('Alta', 'Média', 'Baixa')), 
+
+status VARCHAR2(50) DEFAULT 'Pendente' NOT NULL, 
+
+CHECK (status IN ('Pendente', 'Em análise', 'Em andamento', 'Concluído')), 
+
+dt_analise DATE NOT NULL ); 
+
+); 
