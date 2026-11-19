@@ -2,17 +2,29 @@
 package br.com.fiap.bo;
 
 import br.com.fiap.dao.AnaliseDAO;
+import br.com.fiap.exception.RecursoNaoEncontradoException;
 import br.com.fiap.to.AnaliseTO;
+import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 
+@Service
 public class AnaliseBO {
 
-    AnaliseDAO analiseDAO;
+    private final AnaliseDAO analiseDAO;
+
+    public AnaliseBO(AnaliseDAO analiseDAO) {
+        this.analiseDAO = analiseDAO;
+    }
 
     public AnaliseTO save(AnaliseTO analise) {
-        analiseDAO = new AnaliseDAO();
+
+        if (analise == null || analise.getData() == null) {
+            throw new IllegalArgumentException(
+                    "Informe os dados e a data da análise."
+            );
+        }
 
         if (analise.getData().isAfter(LocalDate.now())) {
             throw new IllegalArgumentException("A data não pode ser futura.");
@@ -33,36 +45,50 @@ public class AnaliseBO {
     }
 
     public ArrayList<AnaliseTO> findAll() {
-
-        analiseDAO = new AnaliseDAO();
         return analiseDAO.findAll();
     }
 
     public AnaliseTO findById(Integer idAnalise) {
 
-        analiseDAO = new AnaliseDAO();
-
         if (idAnalise == null || idAnalise <= 0) {
             throw new IllegalArgumentException("Informe um ID válido.");
         }
 
-        return analiseDAO.findById(idAnalise);
+        AnaliseTO analise = analiseDAO.findById(idAnalise);
+
+        if (analise == null) {
+            throw new RecursoNaoEncontradoException("Análise não encontrada!");
+        }
+
+        return analise;
     }
 
     public boolean delete(Integer idAnalise) {
 
-        analiseDAO = new AnaliseDAO();
-
         if (idAnalise == null || idAnalise <= 0) {
             throw new IllegalArgumentException("Informe um ID válido.");
         }
 
-        return analiseDAO.delete(idAnalise);
+        boolean excluido = analiseDAO.delete(idAnalise);
+
+        if (!excluido) {
+            throw new RecursoNaoEncontradoException(
+                    "Análise não encontrada para exclusão!"
+            );
+        }
+
+        return true;
     }
 
     public AnaliseTO update(AnaliseTO analise) {
 
-        analiseDAO = new AnaliseDAO();
+        if (analise == null || analise.getData() == null) {
+            throw new IllegalArgumentException("Informe os dados e a data da análise.");
+        }
+
+        if (analise.getIdAnalise() == null || analise.getIdAnalise() <= 0) {
+            throw new IllegalArgumentException("Informe um ID válido.");
+        }
 
         if (analise.getData().isAfter(LocalDate.now())) {
             throw new IllegalArgumentException("A data não pode ser futura.");
@@ -79,6 +105,14 @@ public class AnaliseBO {
             throw new IllegalArgumentException("Prioridade inválida.");
         }
 
-        return analiseDAO.update(analise);
+        AnaliseTO resultado = analiseDAO.update(analise);
+
+        if (resultado == null) {
+            throw new RecursoNaoEncontradoException(
+                    "Análise não encontrada para atualização!"
+            );
+        }
+
+        return resultado;
     }
 }

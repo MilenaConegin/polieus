@@ -17,111 +17,56 @@ import java.util.Map;
 @RequestMapping("/polieus/historico")
 public class HistoricoResource {
 
-    private HistoricoBO historicoBO = new HistoricoBO();
+    private final HistoricoBO historicoBO;
+
+    public HistoricoResource(HistoricoBO historicoBO) {
+        this.historicoBO = historicoBO;
+    }
 
     @PostMapping
     public ResponseEntity<?> save(@RequestBody @Valid HistoricoTO historico) {
 
-        try {
             HistoricoTO resultado = historicoBO.save(historico);
-            return ResponseEntity.status(HttpStatus.CREATED).body(resultado);
-        }catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Erro interno ao cadastrar histórico");
-        }
+
+            return ResponseEntity.status(HttpStatus.CREATED).header("Location", "/polieus/historico/"
+                            + resultado.getIdHistorico()).body(resultado);
     }
 
     @GetMapping
     public ResponseEntity<?> findAll() {
         ArrayList<HistoricoTO> historicos = historicoBO.findAll();
-
-        if(historicos != null){
-          return  ResponseEntity.status(HttpStatus.OK).body(historicos);
-        }else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(historicos);
-        }
+        return  ResponseEntity.status(HttpStatus.OK).body(historicos);
     }
 
     @GetMapping("/{idHistorico}")
     public ResponseEntity<?> findById(@PathVariable Integer idHistorico) {
         HistoricoTO historico = historicoBO.findById(idHistorico);
-            if (historico != null) {
-                return ResponseEntity.status(HttpStatus.OK).body(historico);
-            } else {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Histórico não encontrado!");
-            }
+        return ResponseEntity.status(HttpStatus.OK).body(historico);
+
     }
 
     @GetMapping("/ocorrencia/{idOcorrencia}")
     public ResponseEntity<?> findByOcorrencia(@PathVariable Integer idOcorrencia) {
         ArrayList<HistoricoTO> historicos = historicoBO.findByOcorrencia(idOcorrencia);
-        if (historicos != null){
-            return ResponseEntity.status(HttpStatus.OK).body(historicos);
-        }else{
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(historicos);
-        }
+        return ResponseEntity.status(HttpStatus.OK).body(historicos);
     }
 
     @DeleteMapping("/{idHistorico}")
     public ResponseEntity<?> delete(@PathVariable Integer idHistorico) {
-
-        try {
-            if (historicoBO.delete(idHistorico)){
-                return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Histórico deletado com sucesso!");
-            }else{
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Histórico não encontrado!");
-            }
-        } catch (IllegalStateException e) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erro interno ao excluir histórico");
-        }
+        historicoBO.delete(idHistorico);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Histórico deletado com sucesso!");
     }
 
     @PutMapping("/{idHistorico}")
     public ResponseEntity<?> update(@PathVariable Integer idHistorico, @RequestBody @Valid HistoricoTO historico) {
-        try {
             historico.setIdHistorico(idHistorico);
             HistoricoTO resultado = historicoBO.update(historico);
-
-            if (resultado != null) {
-                return ResponseEntity.status(HttpStatus.OK).body(resultado);
-            } else {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Histórico não encontrado.");
-            }
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-
-        } catch (IllegalStateException e) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
-
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erro interno ao atualizar histórico");
-        }
+            return ResponseEntity.status(HttpStatus.OK).body(resultado);
     }
 
     @PutMapping("/ocorrencia/{idOcorrencia}/status")
     public ResponseEntity<?> updateStatus(@PathVariable Integer idOcorrencia, @RequestBody HistoricoTO historico) {
-
-        try {
-            historico.setIdOcorrencia(idOcorrencia);
             HistoricoTO resultado = historicoBO.updateStatus(idOcorrencia, historico.getStatus());
-
-            if (resultado != null) {
-                return ResponseEntity.status(HttpStatus.OK).body(resultado);
-            } else {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Histórico da ocorrência não encontrado.");
-            }
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        } catch (IllegalStateException e) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erro interno ao atualizar status da ocorrência.");
-        }
+            return ResponseEntity.status(HttpStatus.OK).body(resultado);
     }
 }

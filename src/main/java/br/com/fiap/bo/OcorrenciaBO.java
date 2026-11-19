@@ -2,19 +2,27 @@
 package br.com.fiap.bo;
 
 import br.com.fiap.dao.OcorrenciaDAO;
+import br.com.fiap.exception.RecursoNaoEncontradoException;
 import br.com.fiap.to.OcorrenciaTO;
+import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 
+@Service
 public class OcorrenciaBO {
 
-    private OcorrenciaDAO ocorrenciaDAO = new OcorrenciaDAO();
+
+    private final OcorrenciaDAO ocorrenciaDAO;
+
+    public OcorrenciaBO(OcorrenciaDAO ocorrenciaDAO) {
+        this.ocorrenciaDAO = ocorrenciaDAO;
+    }
 
     public OcorrenciaTO save(OcorrenciaTO ocorrencia) {
-        ocorrenciaDAO = new OcorrenciaDAO();
+
 
         if (ocorrencia == null) {
-            throw new RuntimeException("Ocorrência não informada!");
+            throw new IllegalArgumentException("Ocorrência não informada!");
         }
 
         if (ocorrencia.getIdUsuario() == null || ocorrencia.getIdUsuario() <= 0) {
@@ -22,45 +30,49 @@ public class OcorrenciaBO {
         }
 
         if (ocorrencia.getCategoria() == null || ocorrencia.getCategoria().isBlank()) {
-            throw new RuntimeException("Categoria não informada!");
+            throw new IllegalArgumentException("Categoria não informada!");
         }
 
         if (ocorrencia.getDescricao() == null || ocorrencia.getDescricao().isBlank()) {
-            throw new RuntimeException("Descrição não informada!");
+            throw new IllegalArgumentException("Descrição não informada!");
         }
 
         if (ocorrencia.getEndereco() == null || ocorrencia.getEndereco().isBlank()) {
-            throw new RuntimeException("Endereço não informado!");
+            throw new IllegalArgumentException("Endereço não informado!");
         }
 
         if (ocorrencia.getDepartamento() == null || ocorrencia.getDepartamento().isBlank()) {
-            throw new RuntimeException("Departamento não informado!");
+            throw new IllegalArgumentException("Departamento não informado!");
         }
 
         if (ocorrencia.getCep() == null || ocorrencia.getCep().isBlank()) {
-            throw new RuntimeException("CEP não informado!");
+            throw new IllegalArgumentException("CEP não informado!");
         }
 
         return ocorrenciaDAO.save(ocorrencia);
     }
 
     public ArrayList<OcorrenciaTO> findAll() {
-        ocorrenciaDAO = new OcorrenciaDAO();
+
         return ocorrenciaDAO.findAll();
     }
 
     public OcorrenciaTO findById(Integer idOcorrencia) {
-        ocorrenciaDAO = new OcorrenciaDAO();
 
         if (idOcorrencia == null || idOcorrencia <= 0) {
             throw new IllegalArgumentException("ID da ocorrência inválido!");
+        }
+
+        OcorrenciaTO ocorrencia = ocorrenciaDAO.findById(idOcorrencia);
+
+        if (ocorrencia == null) {
+            throw new RecursoNaoEncontradoException("Ocorrência não encontrada!");
         }
 
         return ocorrenciaDAO.findById(idOcorrencia);
     }
 
     public ArrayList<OcorrenciaTO> findByUsuario(Integer idUsuario) {
-        ocorrenciaDAO = new OcorrenciaDAO();
 
         if (idUsuario == null || idUsuario <= 0) {
             throw new IllegalArgumentException("ID do usuário inválido!");
@@ -70,20 +82,22 @@ public class OcorrenciaBO {
     }
 
     public boolean delete(Integer idOcorrencia) {
-        ocorrenciaDAO = new OcorrenciaDAO();
 
         if (idOcorrencia == null || idOcorrencia <= 0) {
             throw new IllegalArgumentException("ID da ocorrência inválido!");
+        }
+
+        if (!ocorrenciaDAO.delete(idOcorrencia)) {
+            throw new RecursoNaoEncontradoException("Ocorrência não encontrada!");
         }
 
         return ocorrenciaDAO.delete(idOcorrencia);
     }
 
     public OcorrenciaTO update(OcorrenciaTO ocorrencia) {
-        ocorrenciaDAO = new OcorrenciaDAO();
 
         if (ocorrencia == null) {
-            throw new RuntimeException("Ocorrência não informada!");
+            throw new IllegalArgumentException("Ocorrência não informada!");
         }
 
         if (ocorrencia.getIdOcorrencia() == null || ocorrencia.getIdOcorrencia() <= 0) {
@@ -95,23 +109,23 @@ public class OcorrenciaBO {
         }
 
         if (ocorrencia.getCategoria() == null || ocorrencia.getCategoria().isBlank()) {
-            throw new RuntimeException("Categoria não informada!");
+            throw new IllegalArgumentException("Categoria não informada!");
         }
 
         if (ocorrencia.getDescricao() == null || ocorrencia.getDescricao().isBlank()) {
-            throw new RuntimeException("Descrição não informada!");
+            throw new IllegalArgumentException("Descrição não informada!");
         }
 
         if (ocorrencia.getEndereco() == null || ocorrencia.getEndereco().isBlank()) {
-            throw new RuntimeException("Endereço não informado!");
+            throw new IllegalArgumentException("Endereço não informado!");
         }
 
         if (ocorrencia.getDepartamento() == null || ocorrencia.getDepartamento().isBlank()) {
-            throw new RuntimeException("Departamento não informado!");
+            throw new IllegalArgumentException("Departamento não informado!");
         }
 
         if (ocorrencia.getCep() == null || ocorrencia.getCep().isBlank()) {
-            throw new RuntimeException("CEP não informado!");
+            throw new IllegalArgumentException("CEP não informado!");
         }
 
         return ocorrenciaDAO.update(ocorrencia);

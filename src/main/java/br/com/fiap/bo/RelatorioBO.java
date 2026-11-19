@@ -2,16 +2,31 @@
 package br.com.fiap.bo;
 
 import br.com.fiap.dao.RelatorioDAO;
+import br.com.fiap.exception.RecursoNaoEncontradoException;
 import br.com.fiap.to.RelatorioTO;
+import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 
+@Service
 public class RelatorioBO {
 
-    RelatorioDAO relatorioDAO;
+    private final RelatorioDAO relatorioDAO;
+
+    public RelatorioBO(RelatorioDAO relatorioDAO) {
+        this.relatorioDAO = relatorioDAO;
+    }
 
     public RelatorioTO save(RelatorioTO relatorio){
-       relatorioDAO = new RelatorioDAO();
+
+        if (relatorio == null) {
+            throw new IllegalArgumentException("Relatório não informado!");
+        }
+
+        if (relatorio.getCategoria() == null ||
+                relatorio.getCategoria().isBlank()) {
+            throw new IllegalArgumentException("Informe uma categoria!");
+        }
 
         if (relatorio.getPrioridade() == null ||
                 (!relatorio.getPrioridade().equals("Alta") &&
@@ -24,45 +39,70 @@ public class RelatorioBO {
     }
 
     public ArrayList<RelatorioTO> findAll(){
-        relatorioDAO = new RelatorioDAO();
         return relatorioDAO.findAll();
     }
 
     public RelatorioTO findById(Integer idRelatorio){
-        relatorioDAO = new RelatorioDAO();
 
         if (idRelatorio == null || idRelatorio <= 0){
             throw new IllegalArgumentException("Informe um ID válido.");
         }
 
-        return relatorioDAO.findById(idRelatorio);
+        RelatorioTO relatorio = relatorioDAO.findById(idRelatorio);
+        if (relatorio == null) {
+            throw new RecursoNaoEncontradoException("Relatório não encontrado!");
+        }
+
+        return relatorio;
     }
 
     public boolean delete(Integer idRelatorio){
-        relatorioDAO = new RelatorioDAO();
 
         if (idRelatorio == null || idRelatorio <= 0){
             throw new IllegalArgumentException("Informe um ID válido.");
         }
 
-        return relatorioDAO.delete(idRelatorio);
+        boolean excluido = relatorioDAO.delete(idRelatorio);
+
+        if (!excluido) {
+            throw new RecursoNaoEncontradoException(
+                    "Relatório não encontrado!"
+            );
+        }
+
+        return true;
     }
 
-    public RelatorioTO update(RelatorioTO relatorio){
-        relatorioDAO = new RelatorioDAO();
+    public RelatorioTO update(RelatorioTO relatorio) {
+
+        if (relatorio == null) {
+            throw new IllegalArgumentException("Relatório não informado!");
+        }
 
         if (relatorio.getIdRelatorio() == null ||
-                relatorio.getIdRelatorio() <= 0){
+                relatorio.getIdRelatorio() <= 0) {
             throw new IllegalArgumentException("Informe um ID válido.");
+        }
+
+        if (relatorio.getCategoria() == null ||
+                relatorio.getCategoria().isBlank()) {
+            throw new IllegalArgumentException("Informe uma categoria!");
         }
 
         if (relatorio.getPrioridade() == null ||
                 (!relatorio.getPrioridade().equals("Alta") &&
                         !relatorio.getPrioridade().equals("Média") &&
-                        !relatorio.getPrioridade().equals("Baixa"))){
+                        !relatorio.getPrioridade().equals("Baixa"))) {
             throw new IllegalArgumentException("Informe uma prioridade válida.");
         }
 
-        return relatorioDAO.update(relatorio);
+        RelatorioTO resultado = relatorioDAO.update(relatorio);
+
+        if (resultado == null) {
+            throw new RecursoNaoEncontradoException(
+                    "Relatório não encontrado!"
+            );
+        }
+        return resultado;
     }
 }

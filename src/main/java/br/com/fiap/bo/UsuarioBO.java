@@ -2,16 +2,26 @@
 package br.com.fiap.bo;
 
 import br.com.fiap.dao.UsuarioDAO;
+import br.com.fiap.exception.RecursoNaoEncontradoException;
 import br.com.fiap.to.UsuarioTO;
+import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 
+@Service
 public class UsuarioBO {
 
-    UsuarioDAO usuarioDAO;
+    private final UsuarioDAO usuarioDAO;
+
+    public UsuarioBO(UsuarioDAO usuarioDAO) {
+        this.usuarioDAO = usuarioDAO;
+    }
 
     public UsuarioTO save(UsuarioTO usuario) {
-        usuarioDAO = new UsuarioDAO();
+
+        if (usuario == null) {
+            throw new IllegalArgumentException("Informe os dados do usuário.");
+        }
 
         if (usuario.getCpf() == null || !usuario.getCpf().matches("^\\d{11}$")) {
             throw new IllegalArgumentException("O CPF deve conter exatamente 11 números.");
@@ -30,34 +40,45 @@ public class UsuarioBO {
     }
 
     public ArrayList<UsuarioTO> findAll() {
-
-        usuarioDAO = new UsuarioDAO();
         return usuarioDAO.findAll();
     }
 
     public UsuarioTO findById(Integer idUsuario) {
 
-        usuarioDAO = new UsuarioDAO();
-
         if (idUsuario == null || idUsuario <= 0) {
             throw new IllegalArgumentException("Informe um ID válido.");
         }
 
-        return usuarioDAO.findById(idUsuario);
+        UsuarioTO usuario = usuarioDAO.findById(idUsuario);
+
+        if (usuario == null) {
+            throw new RecursoNaoEncontradoException("Usuário não encontrado!");
+        }
+
+        return usuario;
     }
 
     public boolean delete(Integer idUsuario) {
-        usuarioDAO = new UsuarioDAO();
 
         if (idUsuario == null || idUsuario <= 0) {
             throw new IllegalArgumentException("Informe um ID válido.");
         }
 
-        return usuarioDAO.delete(idUsuario);
+        boolean excluido = usuarioDAO.delete(idUsuario);
+
+        if (!excluido) {
+            throw new RecursoNaoEncontradoException("Usuário não encontrado!");
+        }
+
+        return true;
     }
 
     public UsuarioTO update(UsuarioTO usuario) {
-        usuarioDAO = new UsuarioDAO();
+
+
+        if (usuario.getIdUsuario() == null || usuario.getIdUsuario() <= 0) {
+            throw new IllegalArgumentException("Informe um ID válido.");
+        }
 
         if (usuario.getCpf() == null || !usuario.getCpf().matches("^\\d{11}$")) {
             throw new IllegalArgumentException("O CPF deve conter exatamente 11 números.");
@@ -77,7 +98,6 @@ public class UsuarioBO {
     }
 
     public UsuarioTO login(UsuarioTO usuario) {
-        usuarioDAO = new UsuarioDAO();
 
         if (usuario == null || usuario.getEmail() == null || usuario.getEmail().isBlank() ||
                 usuario.getSenha() == null || usuario.getSenha().isBlank()) {

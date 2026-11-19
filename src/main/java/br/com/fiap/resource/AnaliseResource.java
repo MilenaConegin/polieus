@@ -14,74 +14,44 @@ import java.util.List;
 @RequestMapping("/polieus/analise")
 public class AnaliseResource {
 
-    private AnaliseBO analiseBO = new AnaliseBO();
+    private final AnaliseBO analiseBO;
+
+    public AnaliseResource(AnaliseBO analiseBO) {
+        this.analiseBO = analiseBO;
+    }
 
     @PostMapping
     public ResponseEntity<?> save(@RequestBody @Valid AnaliseTO analise) {
-        try {
+
             AnaliseTO resultado = analiseBO.save(analise);
-            return ResponseEntity.status(HttpStatus.CREATED).body(resultado);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("Erro ao salvar análise");
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erro interno ao salvar análise");
-        }
+
+            return ResponseEntity.status(HttpStatus.CREATED).header("Location", "/polieus/analise/"
+                            + resultado.getIdAnalise()).body(resultado);
     }
 
     @GetMapping
-    public ResponseEntity<List<AnaliseTO>> findAll() {
+    public ResponseEntity<?> findAll() {
         List<AnaliseTO> analises = analiseBO.findAll();
-        if (analises != null) {
-            return ResponseEntity.status(HttpStatus.OK).body(analises);
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(analises);
-        }
+        return ResponseEntity.status(HttpStatus.OK).body(analises);
     }
 
     @GetMapping("/{idAnalise}")
     public ResponseEntity<?> findById(@PathVariable Integer idAnalise) {
         AnaliseTO analise = analiseBO.findById(idAnalise);
-        if (analise != null) {
-            return ResponseEntity.status(HttpStatus.OK).body(analise);
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Análise não encontrada!");
-        }
+        return ResponseEntity.status(HttpStatus.OK).body(analise);
     }
 
     @DeleteMapping("/{idAnalise}")
     public ResponseEntity<String> delete(@PathVariable Integer idAnalise) {
-        try {
-            if (analiseBO.delete(idAnalise)) {
-                return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Análise deletada com sucesso!");
-            } else {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Análise não encontrada!");
-            }
-        } catch (IllegalStateException e) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erro interno ao excluir ocorrência");
-        }
+        analiseBO.delete(idAnalise);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Análise deletada com sucesso!");
     }
+
 
     @PutMapping("/{idAnalise}")
     public ResponseEntity<?> update(@PathVariable Integer idAnalise, @RequestBody @Valid AnaliseTO analise) {
-        try {
             analise.setIdAnalise(idAnalise);
             AnaliseTO resultado = analiseBO.update(analise);
-
-            if (resultado != null){
-                return ResponseEntity.status(HttpStatus.OK).body(resultado);
-            }else{
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Análise não encontrada!");
-            }
-        }catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        }catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("Erro ao atualizar análise");
-        }catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erro interno ao atualizar análise");
-        }
+            return ResponseEntity.status(HttpStatus.OK).body(resultado);
     }
 }

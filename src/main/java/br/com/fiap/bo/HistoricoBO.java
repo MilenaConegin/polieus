@@ -2,17 +2,23 @@
 package br.com.fiap.bo;
 
 import br.com.fiap.dao.HistoricoDAO;
+import br.com.fiap.exception.RecursoNaoEncontradoException;
 import br.com.fiap.to.HistoricoTO;
+import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 
+@Service
 public class HistoricoBO {
 
-    private HistoricoDAO historicoDAO = new HistoricoDAO();
+    private final HistoricoDAO historicoDAO;
+
+    public HistoricoBO(HistoricoDAO historicoDAO) {
+        this.historicoDAO = historicoDAO;
+    }
 
     public HistoricoTO save(HistoricoTO historico) {
-        historicoDAO = new HistoricoDAO();
 
         if (historico == null) {
             throw new IllegalArgumentException("Informe os dados do histórico!");
@@ -48,26 +54,35 @@ public class HistoricoBO {
             throw new IllegalArgumentException("Status inválido!");
         }
 
-        return historicoDAO.save(historico);
+        HistoricoTO resultado = historicoDAO.save(historico);
+
+        if (resultado == null) {
+            throw new IllegalStateException("Não foi possível cadastrar o histórico!");
+        }
+
+        return resultado;
     }
 
     public ArrayList<HistoricoTO> findAll() {
-        historicoDAO = new HistoricoDAO();
         return historicoDAO.findAll();
     }
 
     public HistoricoTO findById(Integer idHistorico) {
-        historicoDAO = new HistoricoDAO();
 
         if (idHistorico == null || idHistorico <= 0) {
             throw new IllegalArgumentException("Informe um ID válido!");
         }
 
-        return historicoDAO.findById(idHistorico);
+        HistoricoTO historico = historicoDAO.findById(idHistorico);
+
+        if (historico == null) {
+            throw new RecursoNaoEncontradoException("Histórico não encontrado!");
+        }
+
+        return historico;
     }
 
     public ArrayList<HistoricoTO> findByOcorrencia(Integer idOcorrencia) {
-        historicoDAO = new HistoricoDAO();
 
         if (idOcorrencia == null || idOcorrencia <= 0) {
             throw new IllegalArgumentException("Informe uma ocorrência válida!");
@@ -77,17 +92,21 @@ public class HistoricoBO {
     }
 
     public boolean delete(Integer idHistorico) {
-        historicoDAO = new HistoricoDAO();
 
         if (idHistorico == null || idHistorico <= 0) {
             throw new IllegalArgumentException("Informe um ID válido!");
         }
 
-        return historicoDAO.delete(idHistorico);
+        boolean resultado = historicoDAO.delete(idHistorico);
+
+        if (!resultado) {
+            throw new RecursoNaoEncontradoException("Histórico não encontrado!");
+        }
+
+        return true;
     }
 
     public HistoricoTO update(HistoricoTO historico) {
-        historicoDAO = new HistoricoDAO();
 
         if (historico == null) {
             throw new IllegalArgumentException("Informe os dados do histórico!");
@@ -127,7 +146,13 @@ public class HistoricoBO {
             throw new IllegalArgumentException("Status inválido!");
         }
 
-        return historicoDAO.update(historico);
+        HistoricoTO resultado = historicoDAO.update(historico);
+
+        if (resultado == null) {
+            throw new RecursoNaoEncontradoException("Histórico não encontrado!");
+        }
+
+        return resultado;
     }
 
     public HistoricoTO updateStatus(Integer idOcorrencia, String status) {
@@ -144,7 +169,8 @@ public class HistoricoBO {
         ArrayList<HistoricoTO> historicos = historicoDAO.findByOcorrencia(idOcorrencia);
 
         if (historicos.isEmpty()) {
-            return null;
+            throw new RecursoNaoEncontradoException(
+                    "Não existe histórico para essa ocorrência!");
         }
 
         //getLast pega o ultimo elemento do historico que contém o status mais recente da ocorrência

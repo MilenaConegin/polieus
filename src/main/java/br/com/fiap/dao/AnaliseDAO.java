@@ -1,19 +1,27 @@
 
 package br.com.fiap.dao;
 
+import br.com.fiap.exception.RegraNegocioException;
 import br.com.fiap.to.AnaliseTO;
+import org.springframework.stereotype.Repository;
 
-import java.sql.Date;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import javax.sql.DataSource;
+import java.sql.*;
 import java.util.ArrayList;
 
+@Repository
 public class AnaliseDAO {
+
+    private final DataSource dataSource;
+
+    public AnaliseDAO(DataSource dataSource) {
+        this.dataSource = dataSource;
+    }
 
     public AnaliseTO save(AnaliseTO analise) {
         String sql = "insert into ddd_analise(protocolo, categoria, localizacao, prioridade, status, dt_analise) values(?,?,?,?,?,?)";
-        try (PreparedStatement ps = ConnectionFactory.getConnection().prepareStatement(sql)) {
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql, new String[]{"id_analise"})) {
             ps.setString(1, analise.getProtocolo());
             ps.setString(2, analise.getCategoria());
             ps.setString(3, analise.getLocalizacao());
@@ -21,31 +29,37 @@ public class AnaliseDAO {
             ps.setString(5, analise.getStatus());
             ps.setDate(6, Date.valueOf(analise.getData()));
             if (ps.executeUpdate() > 0) {
+
+                try (ResultSet rs = ps.getGeneratedKeys()) {
+                    if (rs.next()) {
+                        analise.setIdAnalise(rs.getInt(1));
+                    } else {
+                        throw new RuntimeException(
+                                "Não foi possível recuperar o ID da análise cadastrada!");
+                    }
+                }
                 return analise;
             } else {
-                return null;
+                throw new RuntimeException(
+                        "Não foi possível cadastrar a análise!"
+                );
             }
         } catch (SQLException e) {
-
             if (e.getErrorCode() == 1) {
-                throw new RuntimeException("Análise já cadastrada!");
+                throw new RegraNegocioException("Análise já cadastrada!");
             }
-
-            System.out.println("Erro ao salvar análise: " + e.getMessage());
-
-        } finally {
-            ConnectionFactory.closeConnection();
+            throw new RuntimeException("Erro ao atualizar análise.");
         }
-        return null;
     }
 
     public ArrayList<AnaliseTO> findAll() {
         ArrayList<AnaliseTO> analises = new ArrayList<AnaliseTO>();
         String sql = "select * from ddd_analise order by id_analise";
-        try (PreparedStatement ps = ConnectionFactory.getConnection().prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
-            if (rs != null) {
-                while (rs.next()) {
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+            ResultSet rs = ps.executeQuery()){
+              if (rs != null) {
+                  while (rs.next()) {
                     AnaliseTO analise = new AnaliseTO();
                     analise.setIdAnalise(rs.getInt("id_analise"));
                     analise.setProtocolo(rs.getString("protocolo"));
@@ -55,14 +69,12 @@ public class AnaliseDAO {
                     analise.setStatus(rs.getString("status"));
                     analise.setData(rs.getDate("dt_analise").toLocalDate());
                     analises.add(analise);
-                }
-            }else {
+                 }
+             } else {
                 return null;
-            }
+             }
         } catch (SQLException e) {
-            System.out.println("Erro na consulta: " +e.getMessage());
-        } finally {
-            ConnectionFactory.closeConnection();
+            throw new RuntimeException("Erro ao consultar análises: " + e.getMessage());
         }
         return analises;
     }
@@ -70,44 +82,48 @@ public class AnaliseDAO {
     public AnaliseTO findById(Integer idAnalise) {
         AnaliseTO analise = new AnaliseTO();
         String sql = "select * from ddd_analise where id_analise = ?";
-        try (PreparedStatement ps = ConnectionFactory.getConnection().prepareStatement(sql)) {
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, idAnalise);
-            ResultSet rs = ps.executeQuery();
-            if (rs.next()) {
-                analise.setIdAnalise(rs.getInt("id_analise"));
-                analise.setProtocolo(rs.getString("protocolo"));
-                analise.setCategoria(rs.getString("categoria"));
-                analise.setLocalizacao(rs.getString("localizacao"));
-                analise.setPrioridade(rs.getString("prioridade"));
-                analise.setStatus(rs.getString("status"));
-                analise.setData(rs.getDate("dt_analise").toLocalDate());
-            } else {
-                return null;
-            }
+           try  (ResultSet rs = ps.executeQuery()) {
+               if (rs.next()) {
+                   analise.setIdAnalise(rs.getInt("id_analise"));
+                   analise.setProtocolo(rs.getString("protocolo"));
+                   analise.setCategoria(rs.getString("categoria"));
+                   analise.setLocalizacao(rs.getString("localizacao"));
+                   analise.setPrioridade(rs.getString("prioridade"));
+                   analise.setStatus(rs.getString("status"));
+                   analise.setData(rs.getDate("dt_analise").toLocalDate());
+               } else {
+                   return null;
+               }
+           }
         } catch (SQLException e) {
             throw new RuntimeException("Erro ao consultar análise: " + e.getMessage());
-        } finally {
-            ConnectionFactory.closeConnection();
         }
         return analise;
     }
 
     public boolean delete(Integer idAnalise) {
         String sql = "delete from ddd_analise where id_analise = ?";
-        try (PreparedStatement ps = ConnectionFactory.getConnection().prepareStatement(sql)) {
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, idAnalise);
             return ps.executeUpdate() > 0;
-        } catch (SQLException e) {
-            System.out.println("Erro ao excluir análise: " + e.getMessage());
-        } finally {
-            ConnectionFactory.closeConnection();
+        }catch (SQLException e) {
+            if (e.getErrorCode() == 2292) {
+                throw new RegraNegocioException(
+                        "Não é possível excluir esta análise, porque existem registros relacionados!");
+            }
+
+            throw new RuntimeException("Erro ao excluir análise.");
         }
-        return false;
     }
 
     public AnaliseTO update(AnaliseTO analise) {
         String sql = "update ddd_analise set protocolo = ?, categoria = ?, localizacao = ?, prioridade = ?, status = ?, dt_analise = ? where id_analise = ?";
-        try (PreparedStatement ps = ConnectionFactory.getConnection().prepareStatement(sql)) {
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, analise.getProtocolo());
             ps.setString(2, analise.getCategoria());
             ps.setString(3, analise.getLocalizacao());
@@ -121,10 +137,8 @@ public class AnaliseDAO {
                 return null;
             }
         } catch (SQLException e) {
-            System.out.println("Erro ao atualizar análise: " + e.getMessage());
-        } finally {
-            ConnectionFactory.closeConnection();
+            throw new RuntimeException("Erro ao atualizar análise: " + e.getMessage());
+
         }
-        return null;
     }
 }
