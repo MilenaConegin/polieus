@@ -58,7 +58,6 @@ public class AnaliseDAO {
         try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
             ResultSet rs = ps.executeQuery()){
-              if (rs != null) {
                   while (rs.next()) {
                     AnaliseTO analise = new AnaliseTO();
                     analise.setIdAnalise(rs.getInt("id_analise"));
@@ -70,9 +69,6 @@ public class AnaliseDAO {
                     analise.setData(rs.getDate("dt_analise").toLocalDate());
                     analises.add(analise);
                  }
-             } else {
-                return null;
-             }
         } catch (SQLException e) {
             throw new RuntimeException("Erro ao consultar análises: " + e.getMessage());
         }

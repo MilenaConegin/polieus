@@ -55,7 +55,6 @@ public class UsuarioDAO {
         try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()){
-            if (rs != null) {
                 while (rs.next()) {
                     UsuarioTO usuario = new UsuarioTO();
                     usuario.setIdUsuario(rs.getInt("id_usuario"));
@@ -66,9 +65,6 @@ public class UsuarioDAO {
                     usuario.setSenha(rs.getString("senha"));
                     usuarios.add(usuario);
                 }
-            } else {
-                return null;
-            }
         }  catch (SQLException e) {
             throw new RuntimeException(
                     "Erro ao consultar usuários: " + e.getMessage());

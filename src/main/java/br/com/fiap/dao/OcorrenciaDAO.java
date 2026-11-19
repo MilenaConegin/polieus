@@ -60,7 +60,6 @@ public class OcorrenciaDAO {
         try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
             ResultSet rs = ps.executeQuery()) {
-            if (rs != null) {
                   while (rs.next()) {
                      OcorrenciaTO ocorrencia = new OcorrenciaTO();
                      ocorrencia.setIdOcorrencia(rs.getInt("id_ocorrencia"));
@@ -72,9 +71,6 @@ public class OcorrenciaDAO {
                      ocorrencia.setCep(rs.getString("num_cep"));
                      ocorrencias.add(ocorrencia);
                   }
-            }else {
-                return null;
-            }
         } catch (SQLException e) {
             throw new RuntimeException("Erro ao consultar ocorrências: " + e.getMessage());
         }

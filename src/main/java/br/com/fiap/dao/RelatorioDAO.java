@@ -52,7 +52,6 @@ public class RelatorioDAO {
         try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
             ResultSet rs = ps.executeQuery()) {
-            if (rs != null) {
                 while (rs.next()) {
                     RelatorioTO relatorio = new RelatorioTO();
                     relatorio.setIdRelatorio(rs.getInt("id_relatorio"));
@@ -60,9 +59,6 @@ public class RelatorioDAO {
                     relatorio.setPrioridade(rs.getString("prioridade"));
                     relatorios.add(relatorio);
                 }
-            } else {
-                return null;
-            }
         }catch (SQLException e) {
             throw new RuntimeException("Erro ao consultar relatórios!");
         }

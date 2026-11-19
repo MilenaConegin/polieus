@@ -57,7 +57,6 @@ public class HistoricoDAO {
         try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
-            if (rs != null) {
                 while (rs.next()) {
                     HistoricoTO historico = new HistoricoTO();
                     historico.setIdHistorico(rs.getInt("id_acompanhamento"));
@@ -68,9 +67,6 @@ public class HistoricoDAO {
                     historico.setStatus(rs.getString("ds_status"));
                     historicos.add(historico);
                 }
-            }else{
-                return null;
-            }
         } catch (SQLException e) {
             throw new RuntimeException("Erro ao consultar históricos: " + e.getMessage());
         }
