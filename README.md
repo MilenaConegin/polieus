@@ -179,6 +179,34 @@ Para POST e PUT, acesse Body, selecione JSON e insira os dados necessários.
 
 Clique em Send e confira o código HTTP e o conteúdo retornado pela API.
 
+
+Exemplos de JSON de entrada e saída 
+
+Usuário save(Post)  
+Endpoint: /polieus/usuario 
+
+URL: https://polieus.onrender.com/polieus/usuario 
+
+
+ Entrada — JSON 
+{ 
+  "nomeUsuario": "Maria Silva", 
+  "cpf": "12345678901", 
+  "telefone": "11987654321", 
+  "email": "maria@email.com", 
+  "senha": "Maria@123" 
+} 
+
+Saída — HTTP 201 Created 
+{ 
+  "idUsuario": 1, 
+  "nomeUsuario": "Maria Silva", 
+  "cpf": "12345678901", 
+  "telefone": "11987654321", 
+  "email": "maria@email.com", 
+  "senha": "Maria@123" 
+} 
+
 7.8 Observações importantes
 - POST: utilizado para cadastrar novos registros e realizar login.
 - GET: utilizado para consultar registros.
