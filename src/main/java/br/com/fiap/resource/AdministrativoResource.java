@@ -24,7 +24,9 @@ public class AdministrativoResource {
     @PostMapping
     public ResponseEntity<?> save(@Valid @RequestBody AdministrativoTO administrativo) {
             AdministrativoTO resultado = administrativoBO.save(administrativo);
-            return ResponseEntity.status(HttpStatus.CREATED).body(resultado);
+
+            return ResponseEntity.status(HttpStatus.CREATED).header("Location", "/polieus/administrativo/"
+                        + resultado.getIdAdmin()).body(resultado);
     }
 
     @GetMapping

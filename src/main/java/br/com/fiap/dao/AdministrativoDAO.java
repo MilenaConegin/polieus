@@ -58,7 +58,7 @@ public class AdministrativoDAO {
         try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
-            if (rs != null) {
+
                 while (rs.next()) {
                     AdministrativoTO administrativo = new AdministrativoTO();
                     administrativo.setIdAdmin(rs.getInt("id_admin"));
@@ -70,9 +70,7 @@ public class AdministrativoDAO {
                     administrativo.setSenha(rs.getString("senha"));
                     administrativos.add(administrativo);
                 }
-            } else {
-                return null;
-            }
+
         } catch (SQLException e) {
             throw new RuntimeException(
                     "Erro ao consultar administradores: " + e.getMessage(), e
